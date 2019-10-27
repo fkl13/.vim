@@ -36,3 +36,14 @@ syntax on                       " enable syntax processing
 set background=dark             " Setting dark mode
 let g:gruvbox_contrast_dark='hard'
 colorscheme gruvbox
+
+"
+" NerdTree
+"
+map <C-n> :NERDTreeToggle<CR>
+
+let NERDTreeShowHidden=1
+let NERDTreeIgnore=['\.vim$', '\~$', '\.git$']
+
+" Close nerdtree on close file
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
