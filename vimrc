@@ -29,6 +29,10 @@ if has('mouse')
     set mouse=a
 endif
 
-syntax on                       " enable syntax processing
-
 set wildmenu                    " visual autocomplete for command menu
+set cursorline                  " highlight current line
+
+syntax on                       " enable syntax processing
+set background=dark             " Setting dark mode
+let g:gruvbox_contrast_dark='hard'
+colorscheme gruvbox
