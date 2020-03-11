@@ -20,7 +20,7 @@ set encoding=utf-8              " Set default encoding to UTF-8
 
 set noswapfile                  " Don't use swapfile
 set nobackup                    " Don't create annoying backup files
-set hidden
+set hidden                      " have more than one unsaved buffer
 
 set incsearch                   " Shows the match while typing
 set hlsearch                    " Highlight found searches
