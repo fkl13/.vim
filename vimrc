@@ -54,3 +54,20 @@ let NERDTreeIgnore=['\.vim$', '\~$', '\.git$']
 
 " Close nerdtree on close file
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+
+" CtrlP
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_working_path_mode = 'ra'    " determine local working directory
+let g:ctrlp_switch_buffer = 'et'        " jump to a file if it's open already
+
+" ignore files in .gitignore
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
+
+" for caching
+let g:ctrlp_use_caching = 1
+let g:ctrlp_clear_cache_on_exit = 1
+let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+
+nmap <C-g> :CtrlPCurWD<cr>
+imap <C-g> <esc>:CtrlPCurWD<cr>
