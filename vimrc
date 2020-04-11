@@ -38,15 +38,48 @@ let g:gruvbox_contrast_dark='hard'
 colorscheme gruvbox
 
 
+" Key bindings
+
+" extra key combination
+let mapleader = ","
+let g:mapleader = ","
+
+" Remove search highlight
+nnoremap <leader><space> :nohlsearch<CR>
+
+" Fast saving
+nmap <leader>w :w!<cr>
+
+" Center the screen
+nnoremap <space> zz
+
+" Search mappings: These will make it so that going to the next one in a
+" search will center on the line it's found in.
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
 nnoremap <Left> :echoe "Use h"<CR>
 nnoremap <Right> :echoe "Use l"<CR>
 nnoremap <Up> :echoe "Use k"<CR>
 nnoremap <Down> :echoe "Use j"<CR>
 
+" Buffer prev/next
+nnoremap <C-x> :bnext<CR>
+nnoremap <C-z> :bprev<CR>
 
-"
+" Better split switching
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
+" Leave insert mode
+imap jk <ESC>l
+
+
+" Plugin configs
+
 " NerdTree
-"
 map <C-n> :NERDTreeToggle<CR>
 
 let NERDTreeShowHidden=1
