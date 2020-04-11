@@ -15,22 +15,34 @@ set number                      " Show line number
 set showcmd                     " Show command in bottom bar
 set showmode                    " Show current mode
 set noerrorbells                " No beeps
+set cursorline                  " highlight current line
+set lazyredraw                  " Wait to redraw "
 
 set encoding=utf-8              " Set default encoding to UTF-8
 
 set noswapfile                  " Don't use swapfile
 set nobackup                    " Don't create annoying backup files
+set nowritebackup
 set hidden                      " have more than one unsaved buffer
 
 set incsearch                   " Shows the match while typing
 set hlsearch                    " Highlight found searches
+set ignorecase                  " Search case insensitive...
+set smartcase                   " ... but not when search pattern contains upper case characters
 
-if has('mouse')
-    set mouse=a
-endif
+" Handle long lines nicely
+set wrap
+set textwidth=79
+set formatoptions=qrn1
 
 set wildmenu                    " visual autocomplete for command menu
-set cursorline                  " highlight current line
+set wildmode=list:longest,full
+
+if has('mouse')
+	set mouse=a
+endif
+
+set autoindent
 
 syntax on                       " enable syntax processing
 set background=dark             " Setting dark mode
