@@ -11,7 +11,7 @@ install: ## Sets up symlinks for vim and neovim
 .PHONY: update-plugins
 update-plugins: ## Updates all plugins
 	git submodule update --init --recursive
-	git submodule foreach 'git pull --recurse-submodules origin `git rev-parse --abbrev-ref HEAD`'	
+	git submodule update --remote
 
 .PHONY: help
 help:
