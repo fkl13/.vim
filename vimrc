@@ -2,6 +2,12 @@
 
 set nocompatible
 
+call plug#begin()
+Plug 'tpope/vim-sensible'
+Plug 'gruvbox-community/gruvbox'
+call plug#end()
+
+
 filetype plugin indent on   " required
 
 "
