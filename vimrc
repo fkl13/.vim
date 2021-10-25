@@ -8,6 +8,7 @@ Plug 'gruvbox-community/gruvbox'
 
 Plug 'preservim/nerdtree'
 Plug 'ap/vim-buftabline'
+Plug 'itchyny/lightline.vim'
 
 Plug 'airblade/vim-rooter'
 Plug '/usr/bin/fzf'
@@ -29,10 +30,10 @@ set backspace=indent,eol,start
 set ruler                       " Show the cursor position all the time
 set number                      " Show line number
 set showcmd                     " Show command in bottom bar
-set showmode                    " Show current mode
+set noshowmode                  " We show the mode with airline or lightline
 set noerrorbells                " No beeps
 set cursorline                  " highlight current line
-set lazyredraw                  " Wait to redraw "
+set lazyredraw                  " Wait to redraw
 
 set encoding=utf-8              " Set default encoding to UTF-8
 
@@ -132,6 +133,26 @@ map <C-p> :Files<CR>
 nmap <leader>; :Buffers<CR>
 
 
+" Lightline
+let g:lightline = {
+      \ 'colorscheme': 'gruvbox',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
+      \   'right': [ [ 'lineinfo' ],
+      \              [ 'percent' ],
+      \              [ 'fileencoding', 'filetype' ] ],
+      \ },
+      \ 'component_function': {
+      \   'filename': 'LightlineFilename',
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ }
+function! LightlineFilename()
+  return expand('%:t') !=# '' ? @% : '[No Name]'
+endfunction
+
+
 " coc
 " Give more space for displaying messages.
 set cmdheight=2
@@ -173,9 +194,9 @@ else
   inoremap <silent><expr> <c-@> coc#refresh()
 endif
 
-
 " CoC
 autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
+
 
 " Fugitive
 nnoremap <leader>gs :Git status<CR>
