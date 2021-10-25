@@ -5,6 +5,10 @@ set nocompatible
 call plug#begin()
 Plug 'tpope/vim-sensible'
 Plug 'gruvbox-community/gruvbox'
+
+Plug '/usr/bin/fzf'
+Plug 'junegunn/fzf.vim'
+
 call plug#end()
 
 
@@ -103,5 +107,13 @@ let NERDTreeIgnore=['\.vim$', '\~$', '\.git$']
 
 " Close nerdtree on close file
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+" FZF
+let g:fzf_buffers_jump = 1
+
+" Open hotkeys
+map <C-p> :Files<CR>
+nmap <leader>; :Buffers<CR>
+
 
 
