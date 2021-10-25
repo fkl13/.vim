@@ -8,6 +8,7 @@ Plug 'gruvbox-community/gruvbox'
 
 Plug 'preservim/nerdtree'
 Plug 'ap/vim-buftabline'
+Plug 'itchyny/lightline.vim'
 
 Plug '/usr/bin/fzf'
 Plug 'junegunn/fzf.vim'
@@ -26,7 +27,7 @@ set backspace=indent,eol,start
 set ruler                       " Show the cursor position all the time
 set number                      " Show line number
 set showcmd                     " Show command in bottom bar
-set showmode                    " Show current mode
+set noshowmode                  " We show the mode with airline or lightline
 set noerrorbells                " No beeps
 set cursorline                  " highlight current line
 set lazyredraw                  " Wait to redraw "
@@ -165,3 +166,23 @@ endif
 
 " CoC
 autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
+
+
+" Lightline
+let g:lightline = {
+      \ 'colorscheme': 'gruvbox',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
+      \   'right': [ [ 'lineinfo' ],
+      \              [ 'percent' ],
+      \              [ 'fileencoding', 'filetype' ] ],
+      \ },
+      \ 'component_function': {
+      \   'filename': 'LightlineFilename',
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ }
+function! LightlineFilename()
+  return expand('%:t') !=# '' ? @% : '[No Name]'
+endfunction
