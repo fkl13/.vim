@@ -176,3 +176,8 @@ endif
 
 " CoC
 autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
+
+" Fugitive
+nnoremap <leader>gs :Git status<CR>
+nnoremap <leader>gd :Gdiffsplit<CR>
+vnoremap <leader>gb :Git blame<CR>
