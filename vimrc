@@ -6,6 +6,9 @@ call plug#begin()
 Plug 'tpope/vim-sensible'
 Plug 'gruvbox-community/gruvbox'
 
+Plug 'preservim/nerdtree'
+Plug 'ap/vim-buftabline'
+
 Plug '/usr/bin/fzf'
 Plug 'junegunn/fzf.vim'
 
