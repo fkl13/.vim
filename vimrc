@@ -9,6 +9,7 @@ Plug 'gruvbox-community/gruvbox'
 Plug 'preservim/nerdtree'
 Plug 'ap/vim-buftabline'
 Plug 'itchyny/lightline.vim'
+Plug 'airblade/vim-gitgutter'
 
 Plug 'airblade/vim-rooter'
 Plug '/usr/bin/fzf'
