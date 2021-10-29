@@ -35,6 +35,7 @@ set noshowmode                  " We show the mode with airline or lightline
 set noerrorbells                " No beeps
 set cursorline                  " highlight current line
 set lazyredraw                  " Wait to redraw
+set laststatus=2
 
 set encoding=utf-8              " Set default encoding to UTF-8
 
@@ -48,6 +49,9 @@ set hlsearch                    " Highlight found searches
 set ignorecase                  " Search case insensitive...
 set smartcase                   " ... but not when search pattern contains upper case characters
 
+set lazyredraw 			" Wait to redraw "
+
+
 " Handle long lines nicely
 set wrap
 set textwidth=79
@@ -55,17 +59,33 @@ set formatoptions=qrn1
 
 set wildmenu                    " visual autocomplete for command menu
 set wildmode=list:longest,full
+set wildignore+=.hg,.git,.svn   " Version control
 
 if has('mouse')
   set mouse=a
 endif
 
 set autoindent
+set smartindent
+set complete-=i
+set showmatch
+set smarttab
 
 syntax on                       " enable syntax processing
 set background=dark             " Setting dark mode
 let g:gruvbox_contrast_dark='hard'
 colorscheme gruvbox
+
+" Completion
+" Better completion
+" menuone: popup even when there's only one match
+" noinsert: Do not insert text until a selection is made
+" noselect: Do not select, force user to select one from the menu
+set completeopt=menuone,noinsert,noselect
+" Better display for messages
+set cmdheight=2
+" You will have bad experience for diagnostic messages when it's default 4000.
+set updatetime=300
 
 
 " Key bindings
@@ -103,8 +123,29 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" Leave insert mode
-imap jk <ESC>l
+" Ctrl+j and Ctrl+k as Esc
+" Ctrl-j is a little awkward unfortunately:
+" https://github.com/neovim/neovim/issues/5916
+" So we also map Ctrl+k
+nnoremap <C-j> <Esc>
+inoremap <C-j> <Esc>
+vnoremap <C-j> <Esc>
+snoremap <C-j> <Esc>
+xnoremap <C-j> <Esc>
+cnoremap <C-j> <C-c>
+onoremap <C-j> <Esc>
+lnoremap <C-j> <Esc>
+tnoremap <C-j> <Esc>
+
+nnoremap <C-k> <Esc>
+inoremap <C-k> <Esc>
+vnoremap <C-k> <Esc>
+snoremap <C-k> <Esc>
+xnoremap <C-k> <Esc>
+cnoremap <C-k> <C-c>
+onoremap <C-k> <Esc>
+lnoremap <C-k> <Esc>
+tnoremap <C-k> <Esc>
 
 
 " Convenient command to see the difference between the current buffer and the
