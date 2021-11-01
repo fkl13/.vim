@@ -17,7 +17,16 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'tpope/vim-fugitive'
 
-Plug 'neovim/nvim-lspconfig'
+if has('nvim')
+  " lsp plugns
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/nvim-cmp'
+
+  " needed for cmp
+  Plug 'hrsh7th/cmp-vsnip'
+  Plug 'hrsh7th/vim-vsnip'
+endif
 
 call plug#end()
 
@@ -49,7 +58,7 @@ set hlsearch                    " Highlight found searches
 set ignorecase                  " Search case insensitive...
 set smartcase                   " ... but not when search pattern contains upper case characters
 
-set lazyredraw 			" Wait to redraw "
+set lazyredraw                  " Wait to redraw
 
 
 " Handle long lines nicely
@@ -202,6 +211,7 @@ vnoremap <leader>gb :Git blame<CR>
 
 
 " LSP
+if has('nvim')
 lua <<EOF
   local lspconfig = require('lspconfig')
   lspconfig.gopls.setup {
@@ -249,18 +259,22 @@ lua <<EOF
 
   end
 
+  -- Add additional capabilities supported by nvim-cmp
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+
   -- Use a loop to conveniently call 'setup' on multiple servers and
   -- map buffer local keybindings when the language server attaches
   local servers = { 'gopls' }
   for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
       on_attach = on_attach,
+      capabilities = capabilities,
       flags = {
         debounce_text_changes = 150,
       }
     }
   end
-
 
   -- See https://github.com/golang/tools/blob/master/gopls/doc/vim.md#neovim-imports
   function goimports(timeout_ms)
@@ -295,3 +309,36 @@ lua <<EOF
 EOF
 
 autocmd BufWritePre *.go lua goimports(1000)
+endif
+
+
+" nvim-cmp (autocompletion)
+if has('nvim')
+lua <<EOF
+-- nvim-cmp setup
+local cmp = require 'cmp'
+cmp.setup {
+  snippet = {
+    -- REQUIRED - you must specify a snippet engine
+    expand = function(args)
+      vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users
+    end,
+  },
+  mapping = {
+    ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+    ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+    ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+    ['<C-y>'] = cmp.config.disable, -- If you want to remove the default `<C-y>` mapping, You can specify `cmp.config.disable` value.
+    ['<C-e>'] = cmp.mapping({
+      i = cmp.mapping.abort(),
+      c = cmp.mapping.close(),
+    }),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' }, -- For vsnip users
+  },
+}
+EOF
+endif
