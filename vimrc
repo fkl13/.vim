@@ -20,12 +20,15 @@ Plug 'tpope/vim-fugitive'
 if has('nvim')
   " lsp plugns
   Plug 'neovim/nvim-lspconfig'
-  Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/cmp-nvim-lsp'
 
   " needed for cmp
-  Plug 'hrsh7th/cmp-vsnip'
-  Plug 'hrsh7th/vim-vsnip'
+  "Plug 'hrsh7th/cmp-vsnip'
+  "Plug 'hrsh7th/vim-vsnip'
+
+  Plug 'L3MON4D3/LuaSnip'
+  Plug 'saadparwaiz1/cmp_luasnip'
 endif
 
 call plug#end()
@@ -321,7 +324,7 @@ cmp.setup {
   snippet = {
     -- REQUIRED - you must specify a snippet engine
     expand = function(args)
-      vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users
+      require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
     end,
   },
   mapping = {
@@ -337,7 +340,7 @@ cmp.setup {
   },
   sources = {
     { name = 'nvim_lsp' },
-    { name = 'vsnip' }, -- For vsnip users
+    { name = 'luasnip' },
   },
 }
 EOF
