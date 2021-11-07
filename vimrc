@@ -7,10 +7,11 @@ Plug 'tpope/vim-sensible'
 Plug 'gruvbox-community/gruvbox'
 
 Plug 'preservim/nerdtree'
-Plug 'ap/vim-buftabline'
+
 Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
 
+" fuzzy finder
 Plug 'airblade/vim-rooter'
 Plug '/usr/bin/fzf'
 Plug 'junegunn/fzf.vim'
@@ -27,9 +28,14 @@ if has('nvim')
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/cmp-buffer'
 
-  " needed for cmp
+  " needed for nvim-cmp
   Plug 'L3MON4D3/LuaSnip'
   Plug 'saadparwaiz1/cmp_luasnip'
+
+  " GUI enhancements
+  Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
+  Plug 'akinsho/bufferline.nvim'
+
 endif
 
 call plug#end()
@@ -361,6 +367,29 @@ cmp.setup {
     { name = 'path' },
     { name = 'buffer' }
   },
+}
+EOF
+endif
+
+" bufferline
+if has('nvim')
+set termguicolors
+lua << EOF
+  require("bufferline").setup{
+    options = {
+      diagnostics = "nvim_lsp"
+    }
+  }
+EOF
+endif
+
+" nvim-web-devicon
+if has('nvim')
+lua << EOF
+require'nvim-web-devicons'.setup{
+ -- globally enable default icons (default to false)
+ -- will get overriden by `get_icons` option
+ default = true;
 }
 EOF
 endif
