@@ -17,6 +17,8 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'tpope/vim-fugitive'
 
+Plug 'plasticboy/vim-markdown'
+
 if has('nvim')
   " lsp plugns
   Plug 'neovim/nvim-lspconfig'
@@ -24,9 +26,6 @@ if has('nvim')
   Plug 'hrsh7th/cmp-nvim-lsp'
 
   " needed for cmp
-  "Plug 'hrsh7th/cmp-vsnip'
-  "Plug 'hrsh7th/vim-vsnip'
-
   Plug 'L3MON4D3/LuaSnip'
   Plug 'saadparwaiz1/cmp_luasnip'
 endif
@@ -211,6 +210,19 @@ endfunction
 nnoremap <leader>gs :Git status<CR>
 nnoremap <leader>gd :Gdiffsplit<CR>
 vnoremap <leader>gb :Git blame<CR>
+
+
+" Markdown
+" disable folding
+let g:vim_markdown_folding_disabled = 1
+
+" Disable conceal
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_conceal_code_blocks = 0
+
+" Allow for the TOC window to auto-fit when it's possible for it to shrink.
+" It never increases its default size (half screen), it only shrinks.
+let g:vim_markdown_toc_autofit = 1
 
 
 " LSP
