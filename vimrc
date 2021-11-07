@@ -24,6 +24,8 @@ if has('nvim')
   Plug 'neovim/nvim-lspconfig'
   Plug 'hrsh7th/nvim-cmp'
   Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/cmp-buffer'
 
   " needed for cmp
   Plug 'L3MON4D3/LuaSnip'
@@ -98,8 +100,9 @@ set cmdheight=2
 " You will have bad experience for diagnostic messages when it's default 4000.
 set updatetime=300
 
-
+"
 " Key bindings
+"
 
 " extra key combination
 let mapleader = ","
@@ -167,7 +170,9 @@ if !exists(":DiffOrig")
         \ | wincmd p | diffthis
 endif
 
+"
 " Plugin configs
+"
 
 " NerdTree
 map <C-n> :NERDTreeToggle<CR>
@@ -330,7 +335,7 @@ endif
 " nvim-cmp (autocompletion)
 if has('nvim')
 lua <<EOF
--- nvim-cmp setup
+
 local cmp = require 'cmp'
 cmp.setup {
   snippet = {
@@ -353,6 +358,8 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'path' },
+    { name = 'buffer' }
   },
 }
 EOF
