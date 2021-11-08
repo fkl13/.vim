@@ -398,6 +398,18 @@ require'nvim-web-devicons'.setup{
  -- will get overriden by `get_icons` option
  default = true;
 }
+require'nvim-web-devicons'.set_icon{
+  vimrc = {
+    icon = "",
+    color = "#019833",
+    name = "Vimrc"
+  },
+  Makefile = {
+    icon = "",
+    color = "#6d8086",
+    name = "Makefile",
+  }
+}
 EOF
 endif
 
