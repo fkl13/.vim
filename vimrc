@@ -123,6 +123,16 @@ set cmdheight=2
 " You will have bad experience for diagnostic messages when it's default 4000.
 set updatetime=300
 
+
+" spell check
+set spelllang=en
+" Show 9 suggestions
+set spellsuggest=best,9
+
+nnoremap <silent> <F11> :set spell!<cr>
+inoremap <silent> <F11> <C-O>:set spell!<cr>
+
+
 "
 " Key bindings
 "
