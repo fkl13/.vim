@@ -265,9 +265,10 @@ let g:vim_markdown_toc_autofit = 1
 
 " LSP
 if has('nvim')
+
+if executable('gopls')
 lua <<EOF
-  local lspconfig = require('lspconfig')
-  lspconfig.gopls.setup {
+  require('lspconfig').gopls.setup {
     cmd = {'gopls', 'serve'},
     settings = {
       gopls = {
@@ -278,7 +279,14 @@ lua <<EOF
       },
     },
   }
+EOF
+else
+  echo "gopls executable is missing: https://github.com/golang/tools/tree/master/gopls"
+endif
 
+
+  lua <<EOF
+  -- setup lsp
   -- Use an on_attach function to only map the following keys
   -- after the language server attaches to the current buffer
   local on_attach = function(client, bufnr)
@@ -309,68 +317,16 @@ lua <<EOF
     buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
     buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
     buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
-
-  end
-
-  -- Add additional capabilities supported by nvim-cmp
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
-
-  -- Use a loop to conveniently call 'setup' on multiple servers and
-  -- map buffer local keybindings when the language server attaches
-  local servers = { 'gopls' }
-  for _, lsp in ipairs(servers) do
-    lspconfig[lsp].setup {
-      on_attach = on_attach,
-      capabilities = capabilities,
-      flags = {
-        debounce_text_changes = 150,
-      }
-    }
-  end
-
-  -- See https://github.com/golang/tools/blob/master/gopls/doc/vim.md#neovim-imports
-  function goimports(timeout_ms)
-    local context = { only = { "source.organizeImports" } }
-    vim.validate { context = { context, "t", true } }
-
-    local params = vim.lsp.util.make_range_params()
-    params.context = context
-
-    -- See the implementation of the textDocument/codeAction callback
-    -- (lua/vim/lsp/handler.lua) for how to do this properly.
-    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms)
-    if not result or next(result) == nil then return end
-    local actions = result[1].result
-    if not actions then return end
-    local action = actions[1]
-
-    -- textDocument/codeAction can return either Command[] or CodeAction[]. If it
-    -- is a CodeAction, it can have either an edit, a command or both. Edits
-    -- should be executed first.
-    if action.edit or type(action.command) == "table" then
-      if action.edit then
-        vim.lsp.util.apply_workspace_edit(action.edit)
-      end
-      if type(action.command) == "table" then
-        vim.lsp.buf.execute_command(action.command)
-      end
-    else
-      vim.lsp.buf.execute_command(action)
-    end
   end
 EOF
-
-autocmd BufWritePre *.go lua goimports(1000)
 endif
 
 
 " nvim-cmp (autocompletion)
 if has('nvim')
 lua <<EOF
-
 local cmp = require 'cmp'
-cmp.setup {
+cmp.setup({
   snippet = {
     -- REQUIRED - you must specify a snippet engine
     expand = function(args)
@@ -396,13 +352,31 @@ cmp.setup {
     { name = 'path' },
     { name = 'buffer' }
   },
-}
+})
+
+-- Add additional capabilities supported by nvim-cmp
+local lspconfig = require'lspconfig'
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+
+-- Add additional completion capabilities provided by nvim-cmp to some language server
+local servers = { 'gopls' }
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
+    flags = {
+      debounce_text_changes = 150,
+    }
+  }
+end
 EOF
 endif
 
 " bufferline
 if has('nvim')
 set termguicolors
+
 lua << EOF
   require("bufferline").setup{
     options = {
