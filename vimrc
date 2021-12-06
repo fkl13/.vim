@@ -22,6 +22,7 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'tpope/vim-fugitive'
 
+Plug 'fatih/vim-go'
 Plug 'plasticboy/vim-markdown'
 
 if has('nvim')
@@ -471,3 +472,15 @@ require('gitsigns').setup {
 }
 EOF
 endif
+
+" vim-go
+let g:go_fmt_command = "goimports"
+let g:go_fmt_autosave = 1
+
+"let g:go_term_enabled = 1
+
+autocmd FileType go nmap <leader>b  <Plug>(go-build)
+autocmd FileType go nmap <leader>r  <Plug>(go-run)
+autocmd FileType go nmap <leader>t  <Plug>(go-test)
+
+" vim:ts=2:sw=2:et
