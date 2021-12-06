@@ -7,6 +7,9 @@ Plug 'tpope/vim-sensible'
 
 " Colorschemes
 Plug 'gruvbox-community/gruvbox'
+Plug 'sainnhe/sonokai'
+" Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
+
 
 Plug 'preservim/nerdtree'
 
@@ -96,9 +99,18 @@ set showmatch
 set smarttab
 
 syntax on                       " enable syntax processing
-set background=dark             " Setting dark mode
-let g:gruvbox_contrast_dark='hard'
-colorscheme gruvbox
+"set background=dark             " Setting dark mode
+"let g:gruvbox_contrast_dark='hard'
+"colorscheme gruvbox
+
+" sonokai
+if has('termguicolors')
+  set termguicolors
+endif
+let g:sonokai_enable_italic = 1
+let g:sonokai_style = 'default'
+colorscheme sonokai
+
 
 " Completion
 " Better completion
@@ -204,7 +216,7 @@ nmap <leader>; :Buffers<CR>
 
 " Lightline
 let g:lightline = {
-      \ 'colorscheme': 'gruvbox',
+      \ 'colorscheme': 'sonokai',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
