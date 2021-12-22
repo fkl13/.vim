@@ -32,6 +32,7 @@ if has('nvim')
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/cmp-buffer'
+  Plug 'f3fora/cmp-spell'
 
   " needed for nvim-cmp
   Plug 'L3MON4D3/LuaSnip'
@@ -56,7 +57,7 @@ filetype plugin indent on   " required
 " General settings
 "
 set backspace=indent,eol,start
-set ruler                       " Show the cursor position all the time
+set ruler                       " Show the cursor position all the time 
 set number                      " Show line number
 set showcmd                     " Show command in bottom bar
 set noshowmode                  " We show the mode with airline or lightline
@@ -133,6 +134,8 @@ set spellsuggest=best,9
 nnoremap <silent> <F11> :set spell!<cr>
 inoremap <silent> <F11> <C-O>:set spell!<cr>
 
+" spell check for git commits
+autocmd FileType gitcommit setlocal spell
 
 "
 " Key bindings
@@ -351,9 +354,14 @@ cmp.setup({
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
     { name = 'path' },
-    { name = 'buffer' }
+    { name = 'buffer' },
+    { name = 'spell' }
   },
 })
+
+-- mandatory to use spellsuggest
+vim.opt.spell = true
+vim.opt.spelllang = { 'en_us' }
 
 -- Add additional capabilities supported by nvim-cmp
 local lspconfig = require'lspconfig'
