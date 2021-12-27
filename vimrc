@@ -41,6 +41,7 @@ if has('nvim')
   " GUI enhancements
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
   Plug 'akinsho/bufferline.nvim'
+  Plug 'lukas-reineke/indent-blankline.nvim'
 
   " git decorations
   Plug 'nvim-lua/plenary.nvim'
@@ -490,5 +491,17 @@ let g:go_fmt_autosave = 1
 autocmd FileType go nmap <leader>b  <Plug>(go-build)
 autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
+
+
+" indent-blankline
+if has('nivm')
+lua <<EOF
+require("indent_blankline").setup {
+  char = "|",
+  buftype_exclude = {"terminal"},
+  show_end_of_line = false,
+}
+EOF
+endif
 
 " vim:ts=2:sw=2:et
