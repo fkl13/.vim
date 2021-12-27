@@ -10,9 +10,6 @@ Plug 'gruvbox-community/gruvbox'
 Plug 'sainnhe/sonokai'
 " Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 
-
-Plug 'preservim/nerdtree'
-
 Plug 'itchyny/lightline.vim'
 
 " fuzzy finder
@@ -40,6 +37,7 @@ if has('nvim')
 
   " GUI enhancements
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
+  Plug 'kyazdani42/nvim-tree.lua'
   Plug 'akinsho/bufferline.nvim'
   Plug 'lukas-reineke/indent-blankline.nvim'
 
@@ -212,14 +210,31 @@ endif
 " Plugin configs
 "
 
-" NerdTree
-map <C-n> :NERDTreeToggle<CR>
+" nvim-tree.lua
+nnoremap <C-n> :NvimTreeToggle<CR>
+nnoremap <leader>r :NvimTreeRefresh<CR>
+nnoremap <leader>n :NvimTreeFindFile<CR>
 
-let NERDTreeShowHidden=1
-let NERDTreeIgnore=['\.vim$', '\~$', '\.git$']
+let g:nvim_tree_add_trailing = 1
+let g:nvim_tree_highlight_opened_files = 1
+let g:nvim_tree_git_hl = 1
 
-" Close nerdtree on close file
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+if has('nvim')
+lua <<EOF
+  require'nvim-tree'.setup {
+    filters = {
+      dotfiles = true,
+      custom = {
+        '.git'
+      },
+      git = {
+        ignore = true
+      },
+    }
+  }
+EOF
+endif
+
 
 " FZF
 let g:fzf_buffers_jump = 1
