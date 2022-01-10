@@ -29,6 +29,7 @@ if has('nvim')
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-cmdline'
   Plug 'f3fora/cmp-spell'
 
   " needed for nvim-cmp
@@ -375,6 +376,12 @@ cmp.setup({
   },
 })
 
+cmp.setup.cmdline(':', {
+  sources = {
+    { name = 'cmdline' }
+  }
+})
+
 -- mandatory to use spellsuggest
 vim.opt.spell = true
 vim.opt.spelllang = { 'en_us' }
@@ -397,6 +404,7 @@ for _, lsp in ipairs(servers) do
 end
 EOF
 endif
+
 
 " bufferline
 if has('nvim')
