@@ -142,17 +142,15 @@ autocmd FileType gitcommit setlocal spell
 "
 
 " extra key combination
-let mapleader = ","
-let g:mapleader = ","
+let mapleader = "\<Space>"
+let g:mapleader = "\<Space>"
 
 " Remove search highlight
-nnoremap <leader><space> :nohlsearch<CR>
+vnoremap <leader>l :nohlsearch<cr>
+nnoremap <leader>l :nohlsearch<cr>
 
 " Fast saving
 nmap <leader>w :w!<cr>
-
-" Center the screen
-nnoremap <space> zz
 
 " Search mappings: These will make it so that going to the next one in a
 " search will center on the line it's found in.
@@ -165,8 +163,8 @@ nnoremap <Up> :echoe "Use k"<CR>
 nnoremap <Down> :echoe "Use j"<CR>
 
 " Buffer prev/next
-nnoremap <C-x> :bnext<CR>
-nnoremap <C-z> :bprev<CR>
+nnoremap <leader><right> :bnext<CR>
+nnoremap <leader><left> :bprev<CR>
 
 " Better split switching
 map <C-j> <C-W>j
@@ -174,38 +172,9 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" Ctrl+j and Ctrl+k as Esc
-" Ctrl-j is a little awkward unfortunately:
-" https://github.com/neovim/neovim/issues/5916
-" So we also map Ctrl+k
-nnoremap <C-j> <Esc>
-inoremap <C-j> <Esc>
-vnoremap <C-j> <Esc>
-snoremap <C-j> <Esc>
-xnoremap <C-j> <Esc>
-cnoremap <C-j> <C-c>
-onoremap <C-j> <Esc>
-lnoremap <C-j> <Esc>
-tnoremap <C-j> <Esc>
+" Leave insert mode
+imap jk <ESC>l
 
-nnoremap <C-k> <Esc>
-inoremap <C-k> <Esc>
-vnoremap <C-k> <Esc>
-snoremap <C-k> <Esc>
-xnoremap <C-k> <Esc>
-cnoremap <C-k> <C-c>
-onoremap <C-k> <Esc>
-lnoremap <C-k> <Esc>
-tnoremap <C-k> <Esc>
-
-
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-        \ | wincmd p | diffthis
-endif
 
 "
 " Plugin configs
