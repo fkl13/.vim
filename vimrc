@@ -44,6 +44,8 @@ if has('nvim')
   " git decorations
   Plug 'nvim-lua/plenary.nvim'
   Plug 'lewis6991/gitsigns.nvim'
+
+  Plug 'windwp/nvim-autopairs'
 endif
 
 call plug#end()
@@ -452,5 +454,18 @@ lua << EOF
 
 EOF
 endif
+
+" nvim-autopairs
+if has('nvim')
+lua <<EOF
+  require('nvim-autopairs').setup{}
+
+  -- If you want insert `(` after select function or method item
+  local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+  local cmp = require('cmp')
+  cmp.event:on( 'confirm_done', cmp_autopairs.on_confirm_done({  map_char = { tex = '' } }))
+EOF
+endif
+
 
 " vim:ts=2:sw=2:et
