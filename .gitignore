@@ -5,3 +5,4 @@ init.vim
 plugged/
 .netrwhist
 autoload/plug.vim.old
+spell/
