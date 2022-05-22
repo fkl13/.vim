@@ -10,8 +10,6 @@ Plug 'gruvbox-community/gruvbox'
 Plug 'sainnhe/sonokai'
 " Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 
-Plug 'itchyny/lightline.vim'
-
 " fuzzy finder
 Plug 'airblade/vim-rooter'
 Plug '/usr/bin/fzf'
@@ -19,7 +17,7 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'tpope/vim-fugitive'
 
-Plug 'fatih/vim-go'
+"Plug 'fatih/vim-go'
 Plug 'plasticboy/vim-markdown'
 
 if has('nvim')
@@ -30,7 +28,6 @@ if has('nvim')
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
-  Plug 'f3fora/cmp-spell'
 
   " needed for nvim-cmp
   Plug 'L3MON4D3/LuaSnip'
@@ -41,11 +38,12 @@ if has('nvim')
   Plug 'kyazdani42/nvim-tree.lua'
   Plug 'akinsho/bufferline.nvim'
   Plug 'lukas-reineke/indent-blankline.nvim'
+  Plug 'nvim-lualine/lualine.nvim'
+  Plug 'onsails/lspkind.nvim'
 
   " git decorations
   Plug 'nvim-lua/plenary.nvim'
   Plug 'lewis6991/gitsigns.nvim'
-
 endif
 
 call plug#end()
@@ -119,7 +117,7 @@ colorscheme sonokai
 " menuone: popup even when there's only one match
 " noinsert: Do not insert text until a selection is made
 " noselect: Do not select, force user to select one from the menu
-set completeopt=menuone,noinsert,noselect
+set completeopt=menu,menuone,noselect
 " Better display for messages
 set cmdheight=2
 " You will have bad experience for diagnostic messages when it's default 4000.
@@ -197,9 +195,9 @@ lua <<EOF
       custom = {
         '.git'
       },
-      git = {
-        ignore = true
-      },
+    },
+    git = {
+      ignore = true
     }
   }
 EOF
@@ -207,6 +205,7 @@ endif
 
 
 " FZF
+" todo replace with telescope
 let g:fzf_buffers_jump = 1
 
 " Open hotkeys
@@ -214,178 +213,40 @@ map <C-p> :Files<CR>
 nmap <leader>; :Buffers<CR>
 
 
-" Lightline
-let g:lightline = {
-      \ 'colorscheme': 'sonokai',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
-      \   'right': [ [ 'lineinfo' ],
-      \              [ 'percent' ],
-      \              [ 'fileencoding', 'filetype' ] ],
-      \ },
-      \ 'component_function': {
-      \   'filename': 'LightlineFilename',
-      \   'gitbranch': 'FugitiveHead'
-      \ },
-      \ }
-function! LightlineFilename()
-  return expand('%:t') !=# '' ? @% : '[No Name]'
-endfunction
-
-
-" Fugitive
-nnoremap <leader>gs :Git status<CR>
-nnoremap <leader>gd :Gdiffsplit<CR>
-nnoremap <leader>gb :Git blame<CR>
-
-
-" Markdown
-" disable folding
-let g:vim_markdown_folding_disabled = 1
-
-" Disable conceal
-let g:vim_markdown_conceal = 0
-let g:vim_markdown_conceal_code_blocks = 0
-
-" Allow for the TOC window to auto-fit when it's possible for it to shrink.
-" It never increases its default size (half screen), it only shrinks.
-let g:vim_markdown_toc_autofit = 1
-
-
-" LSP
-if has('nvim')
-
-if executable('gopls')
-lua <<EOF
-  require('lspconfig').gopls.setup {
-    cmd = {'gopls', 'serve'},
-    settings = {
-      gopls = {
-        analyses = {
-          unusedparams = true,
-        },
-        staticcheck = true,
-      },
-    },
-  }
-EOF
-else
-  echo "gopls executable is missing: https://github.com/golang/tools/tree/master/gopls"
-endif
-
-
-  lua <<EOF
-  -- setup lsp
-  -- Use an on_attach function to only map the following keys
-  -- after the language server attaches to the current buffer
-  local on_attach = function(client, bufnr)
-    local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-    local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
-    -- Enable completion triggered by <c-x><c-o>
-    buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-    -- Mappings.
-    local opts = { noremap=true, silent=true }
-
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-    buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-    buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-    buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-    buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-    buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-    buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
-  end
-EOF
-endif
-
-
-" nvim-cmp (autocompletion)
-if has('nvim')
-lua <<EOF
-local cmp = require 'cmp'
-cmp.setup({
-  snippet = {
-    -- REQUIRED - you must specify a snippet engine
-    expand = function(args)
-      require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-    end,
-  },
-  mapping = {
-    ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-    ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-    ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-    ['<C-e>'] = cmp.mapping({
-      i = cmp.mapping.abort(),
-      c = cmp.mapping.close(),
-    }),
-    ['<CR>'] = cmp.mapping.confirm({
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true
-    }),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'path' },
-    { name = 'buffer' },
-    { name = 'spell' }
-  },
-})
-
-cmp.setup.cmdline(':', {
-  sources = {
-    { name = 'cmdline' }
-  }
-})
-
--- mandatory to use spellsuggest
-vim.opt.spell = true
-vim.opt.spelllang = { 'en_us' }
-
--- Add additional capabilities supported by nvim-cmp
-local lspconfig = require'lspconfig'
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
-
--- Add additional completion capabilities provided by nvim-cmp to some language server
-local servers = { 'gopls' }
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = on_attach,
-    capabilities = capabilities,
-    flags = {
-      debounce_text_changes = 150,
-    }
-  }
-end
-EOF
-endif
-
-
 " bufferline
 if has('nvim')
 set termguicolors
-
 lua << EOF
-  require("bufferline").setup{
-    options = {
-      diagnostics = "nvim_lsp"
-    }
+require("bufferline").setup{
+  options = {
+    diagnostics = "nvim_lsp",
+    offsets = {{filetype = "NvimTree", text = "File Explorer"}},
   }
+}
 EOF
+endif
+
+" indent-blankline
+if has('nivm')
+lua <<EOF
+require("indent_blankline").setup {
+  char = "|",
+  buftype_exclude = {"terminal"},
+  show_end_of_line = false,
+}
+EOF
+endif
+
+" lualine
+if has('nvim')
+lua << EDF
+require('lualine').setup{
+  options = {
+    section_separators = '',
+    component_separators = ''
+  }
+}
+EDF
 endif
 
 " nvim-web-devicon
@@ -410,7 +271,6 @@ require'nvim-web-devicons'.set_icon{
 }
 EOF
 endif
-
 
 " gitsigns.nvim
 if has('nvim')
@@ -474,25 +334,122 @@ require('gitsigns').setup {
 EOF
 endif
 
+
+" Fugitive
+nnoremap <leader>gs :Git status<CR>
+"nnoremap <leader>gd :Gdiffsplit<CR>
+nnoremap <leader>gb :Git blame<CR>
+
+
+" Markdown
+" disable folding
+let g:vim_markdown_folding_disabled = 1
+
+" Disable conceal
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_conceal_code_blocks = 0
+
+" Allow for the TOC window to auto-fit when it's possible for it to shrink.
+" It never increases its default size (half screen), it only shrinks.
+let g:vim_markdown_toc_autofit = 1
+
 " vim-go
-let g:go_fmt_command = "goimports"
-let g:go_fmt_autosave = 1
+"let g:go_fmt_command = 'goimports'
+"let g:go_fmt_autosave = 1
+"
+""let g:go_term_enabled = 1
+"
+"autocmd FileType go nmap <leader>b  <Plug>(go-build)
+"autocmd FileType go nmap <leader>r  <Plug>(go-run)
+"autocmd FileType go nmap <leader>t  <Plug>(go-test)
 
-"let g:go_term_enabled = 1
 
-autocmd FileType go nmap <leader>b  <Plug>(go-build)
-autocmd FileType go nmap <leader>r  <Plug>(go-run)
-autocmd FileType go nmap <leader>t  <Plug>(go-test)
+" LSP
+if has('nvim')
 
-
-" indent-blankline
-if has('nivm')
+if executable('gopls')
 lua <<EOF
-require("indent_blankline").setup {
-  char = "|",
-  buftype_exclude = {"terminal"},
-  show_end_of_line = false,
-}
+  require('lspconfig').gopls.setup {
+    cmd = {'gopls', 'serve'},
+    settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+      },
+    },
+  }
+
+ -- vim.api.nvim_create_autocmd("BufWritePre", {
+   -- pattern = { "*.go" },
+    --callback = vim.lsp.buf.format,
+  --})
+EOF
+else
+  echo "gopls executable is missing: https://github.com/golang/tools/tree/master/gopls"
+endif
+
+" nvim-cmp (autocompletion)
+lua << EOF
+  -- Add additional capabilities supported by nvim-cmp
+  local lspconfig = require'lspconfig'
+  local lspkind = require('lspkind')
+  local cmp = require'cmp'
+  cmp.setup({
+    snippet = {
+      -- Enable LSP snippets
+      -- REQUIRED - you must specify a snippet engine
+    expand = function(args)
+      require("luasnip").lsp_expand(args.body)
+    end,
+    },
+    mapping = {
+      ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+      ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+      ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+      ["<C-f>"] = cmp.mapping.scroll_docs(4),
+      ["<C-e>"] = cmp.mapping.abort(),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<CR>'] = cmp.mapping.confirm({
+        behavior = cmp.ConfirmBehavior.Insert,
+        select = true,
+      }),
+    },
+    -- Installed sources
+    sources = {
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
+      { name = 'path' },
+      { name = 'buffer' },
+    },
+    experimental = {
+      ghost_text = true,
+    },
+    formatting = {
+      format = lspkind.cmp_format {
+        mode = 'symbol_text',
+        with_text = true,
+        menu = {
+          buffer = "[buf]",
+          nvim_lsp = "[LSP]",
+          path = "[path]",
+          luasnip = "[snip]",
+          gh_issues = "[issues]",
+        },
+      }
+    }
+  })
+
+  -- Setup lspconfig.
+  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  local servers = { 'gopls' }
+  for _, lsp in pairs(servers) do
+    lspconfig[lsp].setup {
+      capabilities = capabilities
+    }
+  end
+
 EOF
 endif
 
