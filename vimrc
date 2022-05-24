@@ -8,12 +8,9 @@ Plug 'tpope/vim-sensible'
 " Colorschemes
 Plug 'gruvbox-community/gruvbox'
 Plug 'sainnhe/sonokai'
-" Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 
 " fuzzy finder
 Plug 'airblade/vim-rooter'
-Plug '/usr/bin/fzf'
-Plug 'junegunn/fzf.vim'
 
 Plug 'tpope/vim-fugitive'
 
@@ -45,6 +42,9 @@ if has('nvim')
   " git decorations
   Plug 'nvim-lua/plenary.nvim'
   Plug 'lewis6991/gitsigns.nvim'
+
+  " fuzzy finder
+  Plug 'nvim-telescope/telescope.nvim'
 
   Plug 'windwp/nvim-autopairs'
 endif
@@ -207,13 +207,40 @@ EOF
 endif
 
 
-" FZF
-" todo replace with telescope
-let g:fzf_buffers_jump = 1
+" telescope.nvim
+if has('nvim')
+  " Find files using Telescope command-line sugar.
+  nnoremap <leader>ff <cmd>Telescope find_files<cr>
+  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+  nnoremap <leader>fb <cmd>Telescope buffers<cr>
+  nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
-" Open hotkeys
-map <C-p> :Files<CR>
-nmap <leader>; :Buffers<CR>
+  " Ctrl+p keybindings
+  nnoremap <C-p> <cmd>Telescope find_files<CR>
+  nnoremap <C-g> <cmd>Telescope live_grep<CR>
+  nnoremap <C-b> <cmd>Telescope buffers<CR>
+
+  if !executable('rg')
+    echo "You might want to install ripgrep: https://github.com/BurntSushi/ripgrep#installation"
+  endif
+
+lua << EOF
+require('telescope').setup{
+  defaults = {
+    file_ignore_patterns = {
+      "^.git/",
+      ".DS_Store",
+    },
+    pickers = {
+      find_files = {
+        find_command = {"rg", "--ignore", "--hidden", "--files"},
+      },
+    },
+    extensions = {}
+  }
+}
+EOF
+endif
 
 
 " bufferline
@@ -283,8 +310,8 @@ require('gitsigns').setup {
     add          = {hl = 'GitSignsAdd'   , text = '+', numhl='GitSignsAddNr'   , linehl='GitSignsAddLn'},
     change       = {hl = 'GitSignsChange', text = '~', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
     delete       = {hl = 'GitSignsDelete', text = '_', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
-    topdelete    = {hl = 'GitSignsDelete', text = '_‾', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
-    changedelete = {hl = 'GitSignsChange', text = '~_', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
+    topdelete    = {hl = 'GitSignsDelete', text = '‾', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
+    changedelete = {hl = 'GitSignsChange', text = '~', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
   },
   signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
   numhl      = false, -- Toggle with `:Gitsigns toggle_numhl`
