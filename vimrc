@@ -6,8 +6,8 @@ call plug#begin()
 Plug 'tpope/vim-sensible'
 
 " Colorschemes
-Plug 'gruvbox-community/gruvbox'
 Plug 'sainnhe/sonokai'
+Plug 'sainnhe/gruvbox-material'
 
 " fuzzy finder
 Plug 'airblade/vim-rooter'
