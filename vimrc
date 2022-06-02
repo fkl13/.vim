@@ -103,18 +103,26 @@ set showmatch
 set smarttab
 
 syntax on                       " enable syntax processing
-"set background=dark             " Setting dark mode
-"let g:gruvbox_contrast_dark='hard'
-"colorscheme gruvbox
 
 " sonokai
+"if has('termguicolors')
+"  set termguicolors
+"endif
+"let g:sonokai_enable_italic = 1
+"let g:sonokai_style = 'default'
+"colorscheme sonokai
+
+" gruvbox-material
 if has('termguicolors')
   set termguicolors
 endif
-let g:sonokai_enable_italic = 1
-let g:sonokai_style = 'default'
-colorscheme sonokai
-
+set background=dark
+let g:gruvbox_material_background = 'hard'
+let g:gruvbox_material_foreground = 'mix'
+let g:gruvbox_material_enable_italic = 1
+let g:gruvbox_material_better_performance = 1
+let g:gruvbox_material_statusline_style = 'mix'
+colorscheme gruvbox-material
 
 " Completion
 " Better completion
@@ -277,7 +285,8 @@ lua << EDF
 require('lualine').setup{
   options = {
     section_separators = '',
-    component_separators = ''
+    component_separators = '',
+    theme = 'gruvbox-material'
   }
 }
 EDF
