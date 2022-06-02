@@ -423,9 +423,10 @@ endif
 " nvim-cmp (autocompletion)
 lua << EOF
   -- Add additional capabilities supported by nvim-cmp
-  local lspconfig = require'lspconfig'
+  local lspconfig = require('lspconfig')
   local lspkind = require('lspkind')
-  local cmp = require'cmp'
+  local luasnip = require('luasnip')
+  local cmp = require('cmp')
   cmp.setup({
     snippet = {
       -- Enable LSP snippets
@@ -445,6 +446,24 @@ lua << EOF
         behavior = cmp.ConfirmBehavior.Insert,
         select = true,
       }),
+      ['<Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+      ['<S-Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif luasnip.jumpable(-1) then
+          luasnip.jump(-1)
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
     },
     -- Installed sources
     sources = {
@@ -474,9 +493,10 @@ lua << EOF
   -- Setup lspconfig.
   local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
   local servers = { 'gopls' }
-  for _, lsp in pairs(servers) do
+  for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
-      capabilities = capabilities
+      -- on_attach = my_custom_on_attach,
+      capabilities = capabilities,
     }
   end
 
