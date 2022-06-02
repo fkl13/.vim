@@ -45,6 +45,7 @@ if has('nvim')
 
   " fuzzy finder
   Plug 'nvim-telescope/telescope.nvim'
+  Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
   Plug 'windwp/nvim-autopairs'
 endif
@@ -239,6 +240,8 @@ require('telescope').setup{
     extensions = {}
   }
 }
+
+require('telescope').load_extension('fzf')
 EOF
 endif
 
