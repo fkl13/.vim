@@ -48,6 +48,8 @@ if has('nvim')
   Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
   Plug 'windwp/nvim-autopairs'
+
+  Plug 'folke/which-key.nvim'
 endif
 
 call plug#end()
@@ -575,5 +577,18 @@ lua <<EOF
   )
 EOF
 endif
+
+lua << EOF
+  require("which-key").setup {
+    -- your configuration comes here
+    -- or leave it empty to use the default settings
+    -- refer to the configuration section below
+    icons = {
+      breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
+      separator = "→", -- symbol used between a key and it's label
+      group = "+", -- symbol prepended to a group
+    },
+  }
+EOF
 
 " vim:ts=2:sw=2:et
