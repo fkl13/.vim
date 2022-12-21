@@ -27,7 +27,7 @@ if has('nvim')
   "Plug 'hrsh7th/cmp-cmdline'
 
   " needed for nvim-cmp
-  Plug 'L3MON4D3/LuaSnip'
+  Plug 'L3MON4D3/LuaSnip', {'tag': 'v1.*'}
   Plug 'saadparwaiz1/cmp_luasnip'
 
   " GUI enhancements
@@ -38,7 +38,7 @@ if has('nvim')
   Plug 'nvim-lualine/lualine.nvim'
   Plug 'onsails/lspkind.nvim'
   Plug 'folke/trouble.nvim'
-  Plug 'tami5/lspsaga.nvim'
+  Plug 'glepnir/lspsaga.nvim', { 'branch': 'main' }
 
   " git decorations
   Plug 'nvim-lua/plenary.nvim'
@@ -62,8 +62,8 @@ filetype plugin indent on   " required
 " General settings
 "
 set backspace=indent,eol,start
-set ruler                       " Show the cursor position all the time 
-set number                      " Show line number
+set ruler                       " Show the cursor position all the time
+set number relativenumber       " Show hybrid line number
 set showcmd                     " Show command in bottom bar
 set noshowmode                  " We show the mode with airline or lightline
 set noerrorbells                " No beeps
@@ -88,7 +88,7 @@ set lazyredraw                  " Wait to redraw
 
 " Handle long lines nicely
 set wrap
-set textwidth=79
+set textwidth=80
 set formatoptions=qrn1
 
 set wildmenu                    " visual autocomplete for command menu
@@ -105,8 +105,15 @@ set complete-=i
 set showmatch
 set smarttab
 
-syntax on                       " enable syntax processing
+" Set 80 character line limit
+if exists('+colorcolumn')
+  set colorcolumn=80
+else
+  au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
+endif
 
+
+syntax on                       " enable syntax processing
 " sonokai
 "if has('termguicolors')
 "  set termguicolors
@@ -188,6 +195,11 @@ map <C-l> <C-W>l
 " Leave insert mode
 imap jk <ESC>l
 
+" Close quickfix easily
+nnoremap <leader>a :cclose<CR>
+
+noremap <C-d> <C-d>zz
+noremap <C-u> <C-d>zz
 
 "
 " Plugin configs
@@ -231,7 +243,7 @@ if has('nvim')
   " Ctrl+p keybindings
   nnoremap <C-p> <cmd>Telescope find_files<CR>
   nnoremap <C-g> <cmd>Telescope live_grep<CR>
-  nnoremap <C-b> <cmd>Telescope buffers<CR>
+  "nnoremap <C-b> <cmd>Telescope buffers<CR>
 
   if !executable('rg')
     echo "You might want to install ripgrep: https://github.com/BurntSushi/ripgrep#installation"
@@ -246,6 +258,7 @@ require('telescope').setup{
     },
     pickers = {
       find_files = {
+        theme = "dropdown",
         find_command = {"rg", "--ignore", "--hidden", "--files"},
       },
     },
@@ -403,7 +416,7 @@ let g:vim_markdown_toc_autofit = 1
 "let g:go_fmt_command = 'goimports'
 "let g:go_fmt_autosave = 1
 "
-""let g:go_term_enabled = 1
+"let g:go_term_enabled = 1
 "
 "autocmd FileType go nmap <leader>b  <Plug>(go-build)
 "autocmd FileType go nmap <leader>r  <Plug>(go-run)
@@ -415,8 +428,12 @@ if has('nvim')
 
 if executable('gopls')
 lua <<EOF
-  require('lspconfig').gopls.setup {
+  local lspconfig = require "lspconfig"
+  local util = require "lspconfig/util"
+  lspconfig.gopls.setup {
     cmd = {'gopls', 'serve'},
+    filetypes = {"go", "gomod"},
+    root_dir = util.root_pattern("go.work", "go.mod", ".git"),
     settings = {
       gopls = {
         analyses = {
@@ -434,25 +451,23 @@ lua <<EOF
     end,
   })
 
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = { "*.go" },
-    callback = function()
-      local params = vim.lsp.util.make_range_params(nil, vim.lsp.util._get_offset_encoding())
-      params.context = {only = {"source.organizeImports"}}
-
-      local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
-      for _, res in pairs(result or {}) do
-        for _, r in pairs(res.result or {}) do
-          if r.edit then
-            vim.lsp.util.apply_workspace_edit(r.edit, vim.lsp.util._get_offset_encoding())
-          else
-            vim.lsp.buf.execute_command(r.command)
-          end
+  function go_org_imports(wait_ms)
+    local params = vim.lsp.util.make_range_params()
+    params.context = {only = {"source.organizeImports"}}
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
+    for cid, res in pairs(result or {}) do
+      for _, r in pairs(res.result or {}) do
+        if r.edit then
+          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+          vim.lsp.util.apply_workspace_edit(r.edit, enc)
         end
       end
-    end,
-  })
+    end
+  end
 EOF
+
+autocmd BufWritePre *.go lua go_org_imports()
+
 else
   echo "gopls executable is missing: https://github.com/golang/tools/tree/master/gopls"
 endif
@@ -527,6 +542,12 @@ lua << EOF
     }
   })
 
+  cmp.setup.cmdline(':', {
+    sources = {
+      { name = 'path' },
+    }
+  })
+
   -- Mappings.
   -- See `:help vim.diagnostic.*` for documentation on any of the below functions
   local opts = { noremap=true, silent=true }
@@ -575,7 +596,7 @@ lua << EOF
   end
 
   -- Setup lspconfig.
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
   local servers = { 'gopls' }
   for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
@@ -634,14 +655,15 @@ augroup end
 
 lua <<EOF
   local lspsaga = require 'lspsaga'
-  lspsaga.setup {}
+ -- lspsaga.setup {}
 EOF
 endif
 
 " which-key.nvim
 if has('nvim')
 lua << EOF
-  require("which-key").setup {
+  local wk = require("which-key")
+  wk.setup {
     -- your configuration comes here
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
@@ -651,6 +673,15 @@ lua << EOF
       group = "+", -- symbol prepended to a group
     },
   }
+  wk.register({
+    f = {
+      name = "file",
+      f = {"<cmd>Telescope find_files<cr>", "Find file"},
+      g = {"<cmd>Telescope live_grep<cr>", "Grep"},
+      b = {"<cmd>Telescope buffers<cr>", "Buffers"},
+      h = {"<cmd>Telescope help_tags<cr>", "Help tags"},
+    },
+  }, {prefix = "<leader>"})
 EOF
 endif
 
