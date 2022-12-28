@@ -51,6 +51,8 @@ if has('nvim')
   Plug 'windwp/nvim-autopairs'
 
   Plug 'folke/which-key.nvim'
+
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 endif
 
 call plug#end()
@@ -205,6 +207,25 @@ noremap <C-u> <C-d>zz
 " Plugin configs
 "
 
+" Fugitive
+nnoremap <leader>gs :Git status<CR>
+"nnoremap <leader>gd :Gdiffsplit<CR>
+nnoremap <leader>gb :Git blame<CR>
+
+
+" Markdown
+" disable folding
+let g:vim_markdown_folding_disabled = 1
+
+" Disable conceal
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_conceal_code_blocks = 0
+
+" Allow for the TOC window to auto-fit when it's possible for it to shrink.
+" It never increases its default size (half screen), it only shrinks.
+let g:vim_markdown_toc_autofit = 1
+
+
 " nvim-tree.lua
 nnoremap <C-n> :NvimTreeToggle<CR>
 nnoremap <leader>r :NvimTreeRefresh<CR>
@@ -219,7 +240,7 @@ lua <<EOF
       highlight_git = true
     },
     filters = {
-      dotfiles = true,
+      dotfiles = false,
       custom = {
         '.git'
       },
@@ -250,23 +271,24 @@ if has('nvim')
   endif
 
 lua << EOF
-require('telescope').setup{
-  defaults = {
-    file_ignore_patterns = {
-      "^.git/",
-      ".DS_Store",
-    },
-    pickers = {
-      find_files = {
-        theme = "dropdown",
-        find_command = {"rg", "--ignore", "--hidden", "--files"},
+  local telescope = require'telescope'
+  telescope.setup{
+    defaults = {
+      file_ignore_patterns = {
+        '^.git/',
+        '.DS_Store',
       },
-    },
-    extensions = {}
+      pickers = {
+        find_files = {
+          theme = 'dropdown',
+          find_command = {'rg', '--ignore', '--hidden', '--files'},
+        },
+      },
+      extensions = {}
+    }
   }
-}
 
-require('telescope').load_extension('fzf')
+  telescope.load_extension 'fzf'
 EOF
 endif
 
@@ -275,7 +297,7 @@ endif
 if has('nvim')
 set termguicolors
 lua << EOF
-require("bufferline").setup{
+require"bufferline".setup{
   options = {
     diagnostics = "nvim_lsp",
     offsets = {{filetype = "NvimTree", text = "File Explorer"}},
@@ -287,7 +309,7 @@ endif
 " indent-blankline
 if has('nivm')
 lua <<EOF
-require("indent_blankline").setup {
+require"indent_blankline".setup {
   char = "|",
   buftype_exclude = {"terminal"},
   show_end_of_line = false,
@@ -298,7 +320,7 @@ endif
 " lualine
 if has('nvim')
 lua << EDF
-require('lualine').setup{
+require'lualine'.setup{
   options = {
     section_separators = '',
     component_separators = '',
@@ -334,7 +356,7 @@ endif
 " gitsigns.nvim
 if has('nvim')
 lua <<EOF
-require('gitsigns').setup {
+require'gitsigns'.setup {
   signs = {
     add          = {hl = 'GitSignsAdd'   , text = '+', numhl='GitSignsAddNr'   , linehl='GitSignsAddLn'},
     change       = {hl = 'GitSignsChange', text = '~', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
@@ -394,35 +416,6 @@ EOF
 endif
 
 
-" Fugitive
-nnoremap <leader>gs :Git status<CR>
-"nnoremap <leader>gd :Gdiffsplit<CR>
-nnoremap <leader>gb :Git blame<CR>
-
-
-" Markdown
-" disable folding
-let g:vim_markdown_folding_disabled = 1
-
-" Disable conceal
-let g:vim_markdown_conceal = 0
-let g:vim_markdown_conceal_code_blocks = 0
-
-" Allow for the TOC window to auto-fit when it's possible for it to shrink.
-" It never increases its default size (half screen), it only shrinks.
-let g:vim_markdown_toc_autofit = 1
-
-" vim-go
-"let g:go_fmt_command = 'goimports'
-"let g:go_fmt_autosave = 1
-"
-"let g:go_term_enabled = 1
-"
-"autocmd FileType go nmap <leader>b  <Plug>(go-build)
-"autocmd FileType go nmap <leader>r  <Plug>(go-run)
-"autocmd FileType go nmap <leader>t  <Plug>(go-test)
-
-
 " LSP
 if has('nvim')
 
@@ -472,7 +465,8 @@ else
   echo "gopls executable is missing: https://github.com/golang/tools/tree/master/gopls"
 endif
 
-" nvim-cmp (autocompletion)
+
+"" nvim-cmp (autocompletion)
 lua << EOF
   -- Add additional capabilities supported by nvim-cmp
   local lspconfig = require('lspconfig')
@@ -551,48 +545,19 @@ lua << EOF
   -- Mappings.
   -- See `:help vim.diagnostic.*` for documentation on any of the below functions
   local opts = { noremap=true, silent=true }
-  --vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-  --vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-  --vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-  ---- trouble
-  --vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
-
   -- Use an on_attach function to only map the following keys
   -- after the language server attaches to the current buffer
   local on_attach = function(client, bufnr)
     -- Enable completion triggered by <c-x><c-o>
-    -- disable??
     vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
     -- Mappings.
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     local bufopts = { noremap=true, silent=true, buffer=bufnr }
-    --vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-    --vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-    --vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-    --vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-    --vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-    ------vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-    ------vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-    ------vim.keymap.set('n', '<space>wl', function()
-    ------  print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    ------end, bufopts)
-    --vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-    --vim.keymap.set('n', '<space>r', vim.lsp.buf.rename, bufopts)
-    --vim.keymap.set('n', '<space>a', vim.lsp.buf.code_action, bufopts)
-    --vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-    -- also used for telescope
-    vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
 
     --- In lsp attach function
     local map = vim.api.nvim_buf_set_keymap
-    map(0, "n", "gr", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
-    map(0, "n", "<leader>ca", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
-    map(0, "x", "<leader>ca", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
-    map(0, "n", "<C-q>",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
-    map(0, "n", "<leader>cd", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
-    map(0, "n", "gd", "<cmd>Lspsaga preview_definition<cr>", {silent = true, noremap = true})
-    map(0, "n", "gh", "<cmd>Lspsaga lsp_finder<cr>", {silent = true, noremap = true})
+
   end
 
   -- Setup lspconfig.
@@ -607,7 +572,8 @@ lua << EOF
 EOF
 endif
 
-" nvim-autopairs
+
+"" nvim-autopairs
 if has('nvim')
 lua <<EOF
   require('nvim-autopairs').setup{}
@@ -619,7 +585,8 @@ lua <<EOF
 EOF
 endif
 
-" trouble.nvim
+
+"" trouble.nvim
 if has('nvim')
 lua <<EOF
   require("trouble").setup{}
@@ -646,23 +613,38 @@ lua <<EOF
 EOF
 endif
 
-" lspsaga
+
+"" lspsaga
 if has('nvim')
-augroup lspsaga_filetypes
-  autocmd!
-  autocmd FileType LspsagaHover nnoremap <buffer><nowait><silent> <Esc> <cmd>close!<cr>
-augroup end
 
 lua <<EOF
+  local keymap = vim.keymap.set
   local lspsaga = require 'lspsaga'
- -- lspsaga.setup {}
+
+  lspsaga.init_lsp_saga()
+
+  -- Lsp finder find the symbol definition implement reference
+  keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
+
+  -- Code action
+  keymap({"n","v"}, "<leader>ca", "<cmd>Lspsaga code_action<CR>", { silent = true })
+
+  -- Rename
+  keymap("n", "gr", "<cmd>Lspsaga rename<CR>", { silent = true })
+
+  -- Hover Doc
+  keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", { silent = true })
+
+  -- Outline
+  keymap("n","<leader>o", "<cmd>LSoutlineToggle<CR>",{ silent = true })
 EOF
 endif
 
-" which-key.nvim
+
+"" which-key.nvim
 if has('nvim')
 lua << EOF
-  local wk = require("which-key")
+  local wk = require"which-key"
   wk.setup {
     -- your configuration comes here
     -- or leave it empty to use the default settings
