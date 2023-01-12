@@ -31,9 +31,9 @@ if has('nvim')
   Plug 'saadparwaiz1/cmp_luasnip'
 
   " GUI enhancements
-  Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
-  Plug 'kyazdani42/nvim-tree.lua'
-  Plug 'akinsho/bufferline.nvim'
+  Plug 'nvim-tree/nvim-web-devicons' " Recommended (for coloured icons)
+  Plug 'nvim-tree/nvim-tree.lua'
+  Plug 'akinsho/bufferline.nvim', { 'tag': 'v3.*' }
   Plug 'lukas-reineke/indent-blankline.nvim'
   Plug 'nvim-lualine/lualine.nvim'
   Plug 'onsails/lspkind.nvim'
@@ -233,6 +233,9 @@ nnoremap <leader>n :NvimTreeFindFile<CR>
 
 if has('nvim')
 lua <<EOF
+  vim.g.loaded_netrw = 1
+  vim.g.loaded_netrwPlugin = 1
+
   require'nvim-tree'.setup {
     renderer = {
       add_trailing = true,
@@ -242,7 +245,7 @@ lua <<EOF
     filters = {
       dotfiles = false,
       custom = {
-        '.git'
+        '.git$'
       },
     },
     git = {
