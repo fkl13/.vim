@@ -624,8 +624,6 @@ lua <<EOF
   local keymap = vim.keymap.set
   local lspsaga = require 'lspsaga'
 
-  lspsaga.init_lsp_saga()
-
   -- Lsp finder find the symbol definition implement reference
   keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
 
