@@ -26,7 +26,7 @@ if has('nvim')
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/cmp-buffer'
-  "Plug 'hrsh7th/cmp-cmdline'
+  Plug 'hrsh7th/cmp-cmdline'
 
   " needed for nvim-cmp
   Plug 'L3MON4D3/LuaSnip', {'tag': 'v1.*'}
@@ -565,9 +565,11 @@ lua << EOF
     }
   })
 
-  cmp.setup.cmdline(':', {
+
+  cmp.setup.cmdline({'/', '?'}, {
+    mapping = cmp.mapping.preset.cmdline(),
     sources = {
-      { name = 'path' },
+      { name = 'buffer' }
     }
   })
 
