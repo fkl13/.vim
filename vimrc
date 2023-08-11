@@ -15,6 +15,7 @@ Plug 'airblade/vim-rooter'
 Plug 'tpope/vim-fugitive'
 
 "Plug 'fatih/vim-go'
+Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'rust-lang/rust.vim'
 
