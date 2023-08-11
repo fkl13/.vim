@@ -16,6 +16,7 @@ Plug 'tpope/vim-fugitive'
 
 "Plug 'fatih/vim-go'
 Plug 'plasticboy/vim-markdown'
+Plug 'rust-lang/rust.vim'
 
 if has('nvim')
   " lsp plugns
@@ -225,6 +226,9 @@ let g:vim_markdown_conceal_code_blocks = 0
 " It never increases its default size (half screen), it only shrinks.
 let g:vim_markdown_toc_autofit = 1
 
+" rust
+let g:rustfmt_autosave = 1
+let g:rust_clip_command = 'xclip -selection clipboard'
 
 " nvim-tree.lua
 nnoremap <C-n> :NvimTreeToggle<CR>
@@ -467,7 +471,30 @@ else
 endif
 
 
-"" nvim-cmp (autocompletion)
+if executable('rust-analyzer')
+lua <<EOF
+  local lspconfig = require'lspconfig'
+
+  lspconfig.rust_analyzer.setup({
+    -- cmd = {
+      -- "rustup", "run", "stable", "rust-analyzer",
+    -- },
+    settings = {
+      -- config from: https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
+      ["rust-analyzer"] = {
+        -- enable clippy diagnostics on save
+        checkOnSave = {
+          command = "clippy"
+        },
+      }
+    }
+  })
+EOF
+else
+  echo "You might want to install rust-analyzer: https://rust-analyzer.github.io/manual.html#rust-analyzer-language-server-binary"
+endif
+
+" nvim-cmp (autocompletion)
 lua << EOF
   -- Add additional capabilities supported by nvim-cmp
   local lspconfig = require('lspconfig')
@@ -563,7 +590,7 @@ lua << EOF
 
   -- Setup lspconfig.
   local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
-  local servers = { 'gopls' }
+  local servers = { 'gopls', 'rust_analyzer' }
   for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
       on_attach = on_attach,
