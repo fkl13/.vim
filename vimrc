@@ -9,7 +9,6 @@ Plug 'tpope/vim-sensible'
 Plug 'sainnhe/sonokai'
 Plug 'sainnhe/gruvbox-material'
 
-" fuzzy finder
 Plug 'airblade/vim-rooter'
 
 Plug 'tpope/vim-fugitive'
@@ -20,7 +19,7 @@ Plug 'plasticboy/vim-markdown'
 Plug 'rust-lang/rust.vim'
 
 if has('nvim')
-  " lsp plugns
+  " lsp plugins
   Plug 'neovim/nvim-lspconfig'
   Plug 'hrsh7th/nvim-cmp'
   Plug 'hrsh7th/cmp-nvim-lsp'
@@ -160,6 +159,9 @@ inoremap <silent> <F11> <C-O>:set spell!<cr>
 
 " spell check for git commits
 autocmd FileType gitcommit setlocal spell
+
+" Fix broken syntax highlighting in lua blocks. Install treesitter for lua and vim
+autocmd FileType vim lua vim.treesitter.start()
 
 "
 " Key bindings
@@ -624,7 +626,7 @@ EOF
 endif
 
 
-"" nvim-autopairs
+" nvim-autopairs
 if has('nvim')
 lua <<EOF
   require('nvim-autopairs').setup{
@@ -642,7 +644,7 @@ EOF
 endif
 
 
-"" trouble.nvim
+" trouble.nvim
 if has('nvim')
 lua <<EOF
   require("trouble").setup{}
@@ -670,7 +672,7 @@ EOF
 endif
 
 
-"" lspsaga
+" lspsaga
 if has('nvim')
 
 lua <<EOF
@@ -695,7 +697,7 @@ EOF
 endif
 
 
-"" which-key.nvim
+" which-key.nvim
 if has('nvim')
 lua << EOF
   local wk = require"which-key"
