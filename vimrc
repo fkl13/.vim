@@ -243,7 +243,9 @@ lua <<EOF
   vim.g.loaded_netrw = 1
   vim.g.loaded_netrwPlugin = 1
 
-  require'nvim-tree'.setup {
+  vim.opt.termguicolors = true
+
+  require'nvim-tree'.setup({
     renderer = {
       add_trailing = true,
       highlight_opened_files = 'icon',
@@ -258,7 +260,7 @@ lua <<EOF
     git = {
       ignore = true
     }
-  }
+  })
 EOF
 endif
 
@@ -274,13 +276,12 @@ if has('nvim')
   " Ctrl+p keybindings
   nnoremap <C-p> <cmd>Telescope find_files<CR>
   nnoremap <C-g> <cmd>Telescope live_grep<CR>
-  "nnoremap <C-b> <cmd>Telescope buffers<CR>
 
   if !executable('rg')
     echo "You might want to install ripgrep: https://github.com/BurntSushi/ripgrep#installation"
   endif
 
-lua << EOF
+lua <<EOF
   local telescope = require'telescope'
   telescope.setup{
     defaults = {
@@ -699,7 +700,7 @@ endif
 
 " which-key.nvim
 if has('nvim')
-lua << EOF
+lua <<EOF
   local wk = require"which-key"
   wk.setup {
     -- your configuration comes here
