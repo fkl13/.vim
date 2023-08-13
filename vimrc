@@ -454,10 +454,11 @@ lua <<EOF
   local util = require "lspconfig/util"
   lspconfig.gopls.setup {
     cmd = {'gopls', 'serve'},
-    filetypes = {"go", "gomod"},
+    filetypes = {"go", "gomod", "gowork", "gotmpl"},
     root_dir = util.root_pattern("go.work", "go.mod", ".git"),
     settings = {
       gopls = {
+        usePlaceholders = true,
         analyses = {
           unusedparams = true,
         },
@@ -466,30 +467,14 @@ lua <<EOF
     },
   }
 
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = { "*.go" },
+  vim.api.nvim_create_autocmd('BufWritePre', {
+    pattern = '*.go',
     callback = function()
-      vim.lsp.buf.formatting_sync(nil, 1000)
-    end,
-  })
-
-  function go_org_imports(wait_ms)
-    local params = vim.lsp.util.make_range_params()
-    params.context = {only = {"source.organizeImports"}}
-    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
-    for cid, res in pairs(result or {}) do
-      for _, r in pairs(res.result or {}) do
-        if r.edit then
-          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-          vim.lsp.util.apply_workspace_edit(r.edit, enc)
-        end
-      end
+      vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' } }, apply = true })
     end
-  end
+  })
+-- vim.cmd [[autocmd BufWritePre *.go lua vim.lsp.buf.format()]]
 EOF
-
-autocmd BufWritePre *.go lua go_org_imports()
-
 else
   echo "gopls executable is missing: https://github.com/golang/tools/tree/master/gopls"
 endif
@@ -564,19 +549,19 @@ lua << EOF
       end, { 'i', 's' }),
     },
     -- Installed sources
-    sources = {
+    sources = cmp.config.sources({
       { name = 'nvim_lsp' },
       { name = 'luasnip' },
       { name = 'path' },
+    }, {
       { name = 'buffer' },
-    },
+    }),
     experimental = {
       ghost_text = true,
     },
     formatting = {
-      format = lspkind.cmp_format {
+      format = lspkind.cmp_format({
         mode = 'symbol_text',
-        with_text = true,
         menu = {
           buffer = "[buf]",
           nvim_lsp = "[LSP]",
@@ -584,7 +569,7 @@ lua << EOF
           luasnip = "[snip]",
           gh_issues = "[issues]",
         },
-      }
+      })
     }
   })
 
