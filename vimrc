@@ -471,6 +471,7 @@ lua <<EOF
     pattern = '*.go',
     callback = function()
       vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' } }, apply = true })
+      vim.lsp.buf.format()
     end
   })
 -- vim.cmd [[autocmd BufWritePre *.go lua vim.lsp.buf.format()]]
@@ -650,7 +651,7 @@ if has('nvim')
 
 lua <<EOF
   local keymap = vim.keymap.set
-  local lspsaga = require 'lspsaga'
+  local lspsaga = require('lspsaga').setup({})
 
   -- Lsp finder find the symbol definition implement reference
   keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
