@@ -28,7 +28,7 @@ if has('nvim')
   Plug 'hrsh7th/cmp-cmdline'
 
   " needed for nvim-cmp
-  Plug 'L3MON4D3/LuaSnip', {'tag': 'v1.*'}
+  Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
   Plug 'saadparwaiz1/cmp_luasnip'
 
   " GUI enhancements
