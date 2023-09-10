@@ -597,7 +597,6 @@ lua << EOF
 
     --- In lsp attach function
     local map = vim.api.nvim_buf_set_keymap
-
   end
 
   -- Setup lspconfig.
@@ -650,23 +649,26 @@ endif
 if has('nvim')
 
 lua <<EOF
-  local keymap = vim.keymap.set
   local lspsaga = require('lspsaga').setup({})
+  local keymap = vim.keymap.set
+  local opts = { noremap = true, silent = true }
 
   -- Lsp finder find the symbol definition implement reference
-  keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
+  keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", opts)
 
   -- Code action
-  keymap({"n","v"}, "<leader>ca", "<cmd>Lspsaga code_action<CR>", { silent = true })
+  keymap({"n","v"}, "<leader>ca", "<cmd>Lspsaga code_action<CR>", opts)
 
   -- Rename
-  keymap("n", "gr", "<cmd>Lspsaga rename<CR>", { silent = true })
+  keymap("n", "gr", "<cmd>Lspsaga rename<CR>", opts)
 
   -- Hover Doc
-  keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", { silent = true })
+  keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
 
   -- Outline
-  keymap("n","<leader>o", "<cmd>LSoutlineToggle<CR>",{ silent = true })
+  keymap("n","<leader>o", "<cmd>LSoutlineToggle<CR>",opts)
+
+  keymap('n', 'gp', '<Cmd>Lspsaga preview_definition<CR>', opts)
 EOF
 endif
 
