@@ -18,6 +18,9 @@ Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'rust-lang/rust.vim'
 
+Plug 'wgwoods/vim-systemd-syntax'
+Plug 'MaxMEllon/vim-jsx-pretty'
+
 if has('nvim')
   " lsp plugins
   Plug 'neovim/nvim-lspconfig'
@@ -34,8 +37,8 @@ if has('nvim')
   " GUI enhancements
   Plug 'nvim-tree/nvim-web-devicons' " Recommended (for coloured icons)
   Plug 'nvim-tree/nvim-tree.lua'
-  Plug 'akinsho/bufferline.nvim', { 'tag': 'v3.*' }
-  Plug 'lukas-reineke/indent-blankline.nvim'
+  Plug 'akinsho/bufferline.nvim', { 'tag': 'v4.*' }
+  Plug 'lukas-reineke/indent-blankline.nvim', { 'tag': 'v2.*' }
   Plug 'nvim-lualine/lualine.nvim'
   Plug 'onsails/lspkind.nvim'
   Plug 'folke/trouble.nvim'
@@ -50,6 +53,7 @@ if has('nvim')
   Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
   Plug 'windwp/nvim-autopairs'
+  Plug 'windwp/nvim-ts-autotag'
 
   Plug 'folke/which-key.nvim'
 
@@ -107,6 +111,10 @@ set smartindent
 set complete-=i
 set showmatch
 set smarttab
+
+set tabstop=4
+set shiftwidth=4
+set expandtab
 
 " Set 80 character line limit
 if exists('+colorcolumn')
@@ -178,6 +186,12 @@ nnoremap <leader>l :nohlsearch<cr>
 " Fast saving
 nmap <leader>w :w!<cr>
 
+" clipboard integration
+" ,p will paste clipboard into buffer
+" ,c will copy entire buffer into clipboard
+noremap <leader>p :read !wl-paste<cr>
+noremap <leader>c :w !wl-copy<cr><cr>
+
 " Search mappings: These will make it so that going to the next one in a
 " search will center on the line it's found in.
 nnoremap n nzzzv
@@ -237,6 +251,10 @@ let g:rust_clip_command = 'xclip -selection clipboard'
 nnoremap <C-n> :NvimTreeToggle<CR>
 nnoremap <leader>r :NvimTreeRefresh<CR>
 nnoremap <leader>n :NvimTreeFindFile<CR>
+
+" vim-jsx-pretty
+let g:vim_jsx_pretty_highlight_close_tag = 0
+let g:vim_jsx_pretty_disable_js = 0
 
 if has('nvim')
 lua <<EOF
@@ -444,6 +462,16 @@ require'gitsigns'.setup{
 EOF
 endif
 
+" Treesitter
+if has ('nvim')
+lua <<EOF
+require('nvim-treesitter.configs').setup {
+  highlight = {
+    enabled = true
+  }
+}
+EOF
+endif
 
 " LSP
 if has('nvim')
@@ -530,24 +558,24 @@ lua << EOF
         behavior = cmp.ConfirmBehavior.Insert,
         select = true,
       }),
-      ['<Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-        elseif luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-      ['<S-Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
-          luasnip.jump(-1)
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
+--      ['<Tab>'] = cmp.mapping(function(fallback)
+--        if cmp.visible() then
+--          cmp.select_next_item()
+--        elseif luasnip.expand_or_jumpable() then
+--          luasnip.expand_or_jump()
+--        else
+--          fallback()
+--        end
+--      end, { 'i', 's' }),
+--      ['<S-Tab>'] = cmp.mapping(function(fallback)
+--        if cmp.visible() then
+--          cmp.select_prev_item()
+--        elseif luasnip.jumpable(-1) then
+--          luasnip.jump(-1)
+--        else
+--          fallback()
+--        end
+--      end, { 'i', 's' }),
     },
     -- Installed sources
     sources = cmp.config.sources({
@@ -574,12 +602,21 @@ lua << EOF
     }
   })
 
-
   cmp.setup.cmdline({'/', '?'}, {
     mapping = cmp.mapping.preset.cmdline(),
     sources = {
       { name = 'buffer' }
     }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
   })
 
   -- Mappings.
@@ -604,7 +641,7 @@ lua << EOF
   local servers = { 'gopls', 'rust_analyzer' }
   for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
-      on_attach = on_attach,
+      -- on_attach = on_attach,
       capabilities = capabilities,
     }
   end
@@ -612,7 +649,7 @@ EOF
 endif
 
 
-" nvim-autopairs
+" nvim-autopairs and nvim-ts-autotag
 if has('nvim')
 lua <<EOF
   require('nvim-autopairs').setup{
@@ -626,6 +663,8 @@ lua <<EOF
     'confirm_done',
     cmp_autopairs.on_confirm_done()
   )
+
+  require('nvim-ts-autotag').setup()
 EOF
 endif
 
