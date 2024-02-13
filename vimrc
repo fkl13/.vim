@@ -9,8 +9,6 @@ Plug 'tpope/vim-sensible'
 Plug 'sainnhe/sonokai'
 Plug 'sainnhe/gruvbox-material'
 
-Plug 'airblade/vim-rooter'
-
 Plug 'tpope/vim-fugitive'
 
 "Plug 'fatih/vim-go'
@@ -34,6 +32,8 @@ if has('nvim')
   Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
   Plug 'saadparwaiz1/cmp_luasnip'
 
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
   " GUI enhancements
   Plug 'nvim-tree/nvim-web-devicons' " Recommended (for coloured icons)
   Plug 'nvim-tree/nvim-tree.lua'
@@ -43,6 +43,7 @@ if has('nvim')
   Plug 'onsails/lspkind.nvim'
   Plug 'folke/trouble.nvim'
   Plug 'glepnir/lspsaga.nvim', { 'branch': 'main' }
+  Plug 'RRethy/vim-illuminate'
 
   " git decorations
   Plug 'nvim-lua/plenary.nvim'
@@ -57,7 +58,7 @@ if has('nvim')
 
   Plug 'folke/which-key.nvim'
 
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'notjedi/nvim-rooter.lua'
 endif
 
 call plug#end()
@@ -533,7 +534,7 @@ else
 endif
 
 " nvim-cmp (autocompletion)
-lua << EOF
+lua <<EOF
   -- Add additional capabilities supported by nvim-cmp
   local lspconfig = require('lspconfig')
   local lspkind = require('lspkind')
@@ -735,6 +736,19 @@ lua <<EOF
       h = {"<cmd>Telescope help_tags<cr>", "Help tags"},
     },
   }, {prefix = "<leader>"})
+EOF
+endif
+
+" nvim-rooter
+if has('nvim')
+lua <<EOF
+require("nvim-tree").setup({
+  update_cwd = true,
+  update_focused_file = {
+    enable = true,
+    update_cwd = true
+  },
+})
 EOF
 endif
 
