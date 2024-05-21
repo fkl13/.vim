@@ -92,6 +92,7 @@ set smartcase                   " ... but not when search pattern contains upper
 
 set lazyredraw                  " Wait to redraw
 
+set scrolloff=8
 
 " Handle long lines nicely
 set wrap
@@ -290,6 +291,10 @@ if has('nvim')
   nnoremap <leader>fg <cmd>Telescope live_grep<cr>
   nnoremap <leader>fb <cmd>Telescope buffers<cr>
   nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+  nnoremap <leader>fk <cmd>Telescope keymaps<cr>
+  nnoremap <leader>fs <cmd>Telescope builtin<cr>
+  nnoremap <leader>fw <cmd>Telescope grep_string<cr>
+  nnoremap <leader>fd <cmd>Telescope diagnostics<cr>
 
   " Ctrl+p keybindings
   nnoremap <C-p> <cmd>Telescope find_files<CR>
@@ -313,7 +318,11 @@ lua <<EOF
           find_command = {'rg', '--ignore', '--hidden', '--files'},
         },
       },
-      extensions = {}
+      extensions = {
+        ['ui-select'] = {
+            require('telescope.themes').get_dropdown(),
+          },
+        }
     }
   }
 
@@ -390,7 +399,7 @@ require'gitsigns'.setup{
     add          = { text = '+' },
     change       = { text = '~' },
     delete       = { text = '_' },
-    topdelete    = { text = '_‾' },
+    topdelete    = { text = '‾' },
     changedelete = { text = '~_' },
     untracked    = { text = '┆' },
   },
