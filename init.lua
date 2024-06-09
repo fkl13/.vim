@@ -52,6 +52,13 @@ vim.opt.splitbelow = true
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
+-- Decent wildmenu
+-- in completion, when there is more than one match,
+-- list all matches, and only complete to longest common match
+vim.opt.wildmode = 'list:longest'
+-- when opening a file with a command (like :e), don't suggest files like there:
+vim.opt.wildignore = '.hg,.svn,*~,*.png,*.jpg,*.gif,*.min.js,*.swp,*.o,vendor,dist,_site'
+
 --
 -- Keymaps 
 --
@@ -66,6 +73,22 @@ vim.keymap.set('i', '<up>', '<nop>')
 vim.keymap.set('i', '<down>', '<nop>')
 vim.keymap.set('i', '<left>', '<nop>')
 vim.keymap.set('i', '<right>', '<nop>')
+-- let the left and right arrows be useful: they can switch buffers
+vim.keymap.set('n', '<left>', ':bp<cr>')
+vim.keymap.set('n', '<right>', ':bn<cr>')
+
+-- Neat X clipboard integration
+-- <leader>p will paste clipboard into buffer
+-- <leader>c will copy entire buffer into clipboard
+vim.keymap.set('n', '<leader>p', '<cmd>read !wl-paste<cr>')
+vim.keymap.set('n', '<leader>c', '<cmd>w !wl-copy<cr><cr>')
+
+-- always center search results
+vim.keymap.set('n', 'n', 'nzz', { silent = true })
+vim.keymap.set('n', 'N', 'Nzz', { silent = true })
+vim.keymap.set('n', '*', '*zz', { silent = true })
+vim.keymap.set('n', '#', '#zz', { silent = true })
+vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
 
 --
 -- Autocommands 
