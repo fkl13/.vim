@@ -205,6 +205,15 @@ require("lazy").setup({
         indent = { char = "|" },
       }
     },
+  {
+    'windwp/nvim-autopairs',
+    event = "InsertEnter",
+    config = true
+    -- use opts = {} for passing setup options
+  },
+  {
+    'windwp/nvim-ts-autotag'
+  },
     { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
