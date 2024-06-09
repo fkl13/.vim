@@ -225,6 +225,17 @@ require("lazy").setup({
       }
     },
   },
+  {
+    'akinsho/bufferline.nvim',
+    version = "*",
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    opts = {
+      options = {
+        diagnostics = "nvim_lsp",
+          offsets = {{filetype = "NvimTree", text = "File Explorer"}},
+      }
+    }
+  },
     { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
