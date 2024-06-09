@@ -67,6 +67,19 @@ vim.keymap.set('i', '<down>', '<nop>')
 vim.keymap.set('i', '<left>', '<nop>')
 vim.keymap.set('i', '<right>', '<nop>')
 
+--
+-- Autocommands 
+--
+
+-- Highlight when yanking (copying) text
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({
@@ -91,7 +104,6 @@ require("lazy").setup({
       -- disable netrw at the very start of your init.lua
         vim.opt.termguicolors = true
         vim.opt.background = 'dark'
-
         vim.g.gruvbox_material_enable_italic = true
         vim.g.gruvbox_material_background = 'hard'
         vim.g.gruvbox_material_foreground = 'mix'
@@ -124,30 +136,36 @@ require("lazy").setup({
         attach_to_untracked = true,
       }
     },
-  {
-    'nvim-tree/nvim-tree.lua',
+    {
+      'nvim-tree/nvim-tree.lua',
       version = "*",
-  lazy = false,
-  dependencies = {
-    "nvim-tree/nvim-web-devicons",
-  },
-    config = function()
-      -- disable netrw at the very start of your init.lua
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+      lazy = false,
+      dependencies = {
+        "nvim-tree/nvim-web-devicons",
+      },
+      config = function()
+        -- disable netrw at the very start of your init.lua
+        vim.g.loaded_netrw = 1
+        vim.g.loaded_netrwPlugin = 1
 
--- optionally enable 24-bit colour
-vim.opt.termguicolors = true
-    require("nvim-tree").setup({
-            renderer = {
-      add_trailing = true,
-      highlight_opened_files = 'icon',
-      highlight_git = true
+        -- optionally enable 24-bit colour
+        vim.opt.termguicolors = true
+        require("nvim-tree").setup({
+          renderer = {
+            add_trailing = true,
+            highlight_opened_files = 'icon',
+            highlight_git = true
+          },
+        })
+      end,
     },
-      })
-  end,
-  },
-
+    {
+      "lukas-reineke/indent-blankline.nvim",
+      main = "ibl",
+      opts = {
+        indent = { char = "|" },
+      }
+    },
     { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
