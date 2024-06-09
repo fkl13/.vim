@@ -150,15 +150,31 @@ require("lazy").setup({
 
         -- optionally enable 24-bit colour
         vim.opt.termguicolors = true
+
+        vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<cr>')
+        vim.keymap.set('n', '<leader>nf', '<cmd>NvimTreeFindFile<cr>')
+
         require("nvim-tree").setup({
           renderer = {
             add_trailing = true,
             highlight_opened_files = 'icon',
             highlight_git = true
           },
+          -- integration with nvim-rooter
+          update_cwd = true,
+          update_focused_file = {
+            enable = true,
+            update_cwd = true
+          },
         })
       end,
     },
+  {
+    'notjedi/nvim-rooter.lua',
+    config = function()
+      require('nvim-rooter').setup({})
+    end
+  },
     {
       "lukas-reineke/indent-blankline.nvim",
       main = "ibl",
