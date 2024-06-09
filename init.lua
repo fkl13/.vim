@@ -214,6 +214,17 @@ require("lazy").setup({
   {
     'windwp/nvim-ts-autotag'
   },
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    opts = {
+      options = {
+        component_separators = '',
+        section_separators = '',
+        theme = 'gruvbox-material'
+      }
+    },
+  },
     { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
