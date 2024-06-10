@@ -504,6 +504,9 @@ require("lazy").setup({
             --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
         end,
     },
+    {
+        "RRethy/vim-illuminate"
+    }
 })
 
 -- vim: ts=4 sts=4 sw=4 et
