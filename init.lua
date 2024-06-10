@@ -59,6 +59,10 @@ vim.opt.wildmode = 'list:longest'
 -- when opening a file with a command (like :e), don't suggest files like there:
 vim.opt.wildignore = '.hg,.svn,*~,*.png,*.jpg,*.gif,*.min.js,*.swp,*.o,vendor,dist,_site'
 
+-- Set highlight on search, but clear on pressing <Esc> in normal mode
+vim.opt.hlsearch = true
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
 --
 -- Keymaps 
 --
@@ -67,12 +71,12 @@ vim.opt.wildignore = '.hg,.svn,*~,*.png,*.jpg,*.gif,*.min.js,*.swp,*.o,vendor,di
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>')
 
 -- no arrow keys --- force yourself to use the home row
-vim.keymap.set('n', '<up>', '<nop>')
-vim.keymap.set('n', '<down>', '<nop>')
-vim.keymap.set('i', '<up>', '<nop>')
-vim.keymap.set('i', '<down>', '<nop>')
-vim.keymap.set('i', '<left>', '<nop>')
-vim.keymap.set('i', '<right>', '<nop>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j!"<CR>')
+vim.keymap.set('i', '<up>', '<cmd>echo "Use k!"<CR>')
+vim.keymap.set('i', '<down>', '<cmd>echo "Use j!"<CR>')
+vim.keymap.set('i', '<left>', '<cmd>echo "Use h!"<CR>')
+vim.keymap.set('i', '<right>', '<cmd>echo "Use l!"<CR>')
 -- let the left and right arrows be useful: they can switch buffers
 vim.keymap.set('n', '<left>', ':bp<cr>')
 vim.keymap.set('n', '<right>', ':bn<cr>')
@@ -174,7 +178,7 @@ require("lazy").setup({
         -- optionally enable 24-bit colour
         vim.opt.termguicolors = true
 
-        vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<cr>')
+--        vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<cr>')
         vim.keymap.set('n', '<leader>nf', '<cmd>NvimTreeFindFile<cr>')
 
         require("nvim-tree").setup({
@@ -306,6 +310,179 @@ require("lazy").setup({
       end, { desc = '[S]earch [/] in Open Files' })
 
     end,
+  },
+  {
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      { 'j-hui/fidget.nvim', opts = {} },
+    },
+    config = function() 
+      local lspconfig = require('lspconfig')
+      local util = require('lspconfig/util')
+
+      -- Diagnostic keymaps
+      -- See `:help vim.diagnostic.*` for documentation on any of the below functions
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
+      vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
+      vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+      -- Use LspAttach autocommand to only map the following keys
+      -- after the language server attaches to the current buffer
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+        callback = function(event)
+          local map = function(keys, func, desc)
+            vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          end
+
+          -- Jump to the definition of the word under your cursor.
+          --  To jump back, press <C-t>.
+          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+
+          -- Jump to the Declaration. For example, in C this would take you to the header.
+          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          -- Find references for the word under your cursor.
+          map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+
+          -- Jump to the implementation of the word under your cursor.
+          --  Useful when the language has ways of declaring types without an actual implementation.
+          map('gi', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+
+          -- Rename the variable under your cursor.
+          map('<leader>r', vim.lsp.buf.rename, '[R]ename')
+
+          -- Execute a code action, usually your cursor needs to be on top of an error
+          -- or a suggestion from your LSP for this to activate.
+          map('<leader>a', vim.lsp.buf.code_action, 'Code [A]ction')
+
+          -- Opens a popup that displays documentation about the word under your cursor
+          --  See `:help K` for why this keymap.
+          map('K', vim.lsp.buf.hover, 'Hover Documentation')
+
+          local opts = { buffer = event.buf }
+          vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+
+          -- Jump to the type of the word under your cursor.
+          --  Useful when you're not sure what type a variable is and you want to see
+          --  the definition of its *type*, not where it was *defined*.
+          -- map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+
+          -- Fuzzy find all the symbols in your current document.
+          --  Symbols are things like variables, functions, types, etc.
+          -- map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+
+          -- Fuzzy find all the symbols in your current workspace.
+          --  Similar to document symbols, except searches over your entire project.
+          -- map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          -- The following autocommand is used to enable inlay hints in your
+          -- code, if the language server you are using supports them
+          --
+          -- This may be unwanted, since they displace some of your code
+          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+            map('<leader>th', function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+            end, '[T]oggle Inlay [H]ints')
+          end
+        end
+      })
+
+      local servers = {
+        gopls = {
+          cmd = {'gopls', 'serve'},
+          filetypes = {"go", "gomod", "gowork", "gotmpl"},
+          root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+          settings = {
+            gopls = {
+              usePlaceholders = true,
+              analyses = {
+                unusedparams = true,
+              },
+              staticcheck = true,
+            },
+          },
+        },
+        rust_analyzer = {
+          settings = {
+            -- config from: https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
+            ["rust-analyzer"] = {
+              -- enable clippy diagnostics on save
+              checkOnSave = {
+                command = "clippy"
+              },
+            }
+          }
+        },
+      }
+
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+      for server_name, server in pairs(servers) do
+        lspconfig[server_name].setup(server)
+      end
+    end
+  },
+  { -- Autocompletion
+    'hrsh7th/nvim-cmp',
+    -- load cmp on InsertEnter
+    event = "InsertEnter",
+    dependencies = {
+      'neovim/nvim-lspconfig',
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-cmdline',
+      'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip'
+    },
+    config = function()
+      -- See `:help cmp`
+      local cmp = require'cmp'
+      local luasnip = require 'luasnip'
+      luasnip.config.setup {}
+
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          -- Select the [n]ext item
+          ['<C-n>'] = cmp.mapping.select_next_item(),
+          -- Select the [p]revious item
+          ['<C-p>'] = cmp.mapping.select_prev_item(),
+
+          -- Scroll the documentation window [b]ack / [f]orward
+          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+          ['<C-f>'] = cmp.mapping.scroll_docs(4),
+          ['<C-e>'] = cmp.mapping.abort(),
+
+          -- Manually trigger a completion from nvim-cmp.
+          ['<C-Space>'] = cmp.mapping.complete(),
+          -- Accept currently selected item.
+          ['<CR>'] = cmp.mapping.confirm({ select = true }),
+        }),
+        sources = {
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'path' },
+        },
+      })
+
+      -- Use cmdline & path source for ':'
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' }
+        }, {
+          { name = 'cmdline' }
+        })
+      })
+    end
   },
   { -- Highlight, edit, and navigate code
     -- See `:help nvim-treesitter`
