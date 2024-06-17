@@ -212,8 +212,14 @@ require("lazy").setup({
     {
         "windwp/nvim-autopairs",
         event = "InsertEnter",
-        config = true,
-        -- use opts = {} for passing setup options
+        dependencies = { "hrsh7th/nvim-cmp" },
+        config = function()
+            require("nvim-autopairs").setup({})
+            -- If you want to automatically add `(` after selecting a function or method
+            local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+            local cmp = require("cmp")
+            cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+        end,
     },
     {
         "windwp/nvim-ts-autotag",
@@ -505,8 +511,24 @@ require("lazy").setup({
         end,
     },
     {
-        "RRethy/vim-illuminate"
-    }
+        "RRethy/vim-illuminate",
+    },
+    {
+        "tpope/vim-fugitive",
+    },
+    {
+        "folke/which-key.nvim",
+        event = "VeryLazy",
+        init = function()
+            vim.o.timeout = true
+            vim.o.timeoutlen = 300
+        end,
+        opts = {
+            -- your configuration comes here
+            -- or leave it empty to use the default settings
+            -- refer to the configuration section below
+        },
+    },
 })
 
 -- vim: ts=4 sts=4 sw=4 et
