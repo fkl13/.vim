@@ -63,6 +63,11 @@ vim.opt.wildignore = ".hg,.svn,*~,*.png,*.jpg,*.gif,*.min.js,*.swp,*.o,vendor,di
 vim.opt.hlsearch = true
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
+-- Spell check
+vim.opt.spelllang = 'en_us'
+vim.opt.spell = true
+vim.keymap.set("n", "<F6>", "<cmd>setlocal spell! spell?<cr>")
+
 --
 -- Keymaps
 --
