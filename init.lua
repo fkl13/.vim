@@ -1,4 +1,4 @@
---Make sure to set `mapleader` before lazy so your mappings are correct
+-- Make sure to set `mapleader` before lazy so your mappings are correct
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -29,7 +29,7 @@ vim.opt.cursorline = true
 
 -- never show me line breaks if they're not there
 vim.opt.wrap = false
--- always draw sign column. prevents buffer moving when adding/deleting sign
+-- always draw sign column. Prevents buffer moving when adding/deleting sign
 vim.opt.signcolumn = "yes"
 
 -- case-insensitive search/replace
@@ -294,9 +294,11 @@ require("lazy").setup({
             vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
             vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
             vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
+            vim.keymap.set("n", "<C-p>", builtin.find_files)
             vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
             vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
             vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
+            vim.keymap.set("n", "<C-g>", builtin.live_grep)
             vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
             vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
             vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -347,7 +349,7 @@ require("lazy").setup({
                     end
 
                     -- Jump to the definition of the word under your cursor.
-                    --  To jump back, press <C-t>.
+                    -- To jump back, press <C-t>.
                     map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
 
                     -- Jump to the Declaration. For example, in C this would take you to the header.
@@ -357,7 +359,7 @@ require("lazy").setup({
                     map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 
                     -- Jump to the implementation of the word under your cursor.
-                    --  Useful when the language has ways of declaring types without an actual implementation.
+                    -- Useful when the language has ways of declaring types without an actual implementation.
                     map("gi", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
 
                     -- Rename the variable under your cursor.
@@ -368,23 +370,23 @@ require("lazy").setup({
                     map("<leader>a", vim.lsp.buf.code_action, "Code [A]ction")
 
                     -- Opens a popup that displays documentation about the word under your cursor
-                    --  See `:help K` for why this keymap.
+                    -- See `:help K` for why this keymap.
                     map("K", vim.lsp.buf.hover, "Hover Documentation")
 
                     local opts = { buffer = event.buf }
                     vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
 
                     -- Jump to the type of the word under your cursor.
-                    --  Useful when you're not sure what type a variable is and you want to see
-                    --  the definition of its *type*, not where it was *defined*.
+                    -- Useful when you're not sure what type a variable is and you want to see
+                    -- the definition of its *type*, not where it was *defined*.
                     -- map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
 
                     -- Fuzzy find all the symbols in your current document.
-                    --  Symbols are things like variables, functions, types, etc.
+                    -- Symbols are things like variables, functions, types, etc.
                     -- map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
 
                     -- Fuzzy find all the symbols in your current workspace.
-                    --  Similar to document symbols, except searches over your entire project.
+                    -- Similar to document symbols, except searches over your entire project.
                     -- map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
                     local client = vim.lsp.get_client_by_id(event.data.client_id)
@@ -528,11 +530,16 @@ require("lazy").setup({
             vim.o.timeout = true
             vim.o.timeoutlen = 300
         end,
-        opts = {
-            -- your configuration comes here
-            -- or leave it empty to use the default settings
-            -- refer to the configuration section below
-        },
+        config = function()
+            local wk = require("which-key")
+            wk.setup()
+
+            wk.register({
+                ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+                ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+                ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+            })
+        end
     },
     {
         "plasticboy/vim-markdown",
