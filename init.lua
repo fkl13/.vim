@@ -37,12 +37,25 @@ vim.opt.ignorecase = true
 -- unless uppercase in search term
 vim.opt.smartcase = true
 
+-- Enable break indent
+vim.opt.breakindent = true
+
 -- Save undo history
 -- NOTE: ends up in ~/.local/state/nvim/undo/
 vim.opt.undofile = true
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
+
+-- Decrease update time
+vim.opt.updatetime = 250
+
+-- Decrease mapped sequence wait time
+-- Displays which-key popup sooner
+vim.opt.timeoutlen = 300
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = "split"
 
 -- keep current content top + left when splitting
 vim.opt.splitright = true
@@ -59,12 +72,8 @@ vim.opt.wildmode = "list:longest"
 -- when opening a file with a command (like :e), don't suggest files like there:
 vim.opt.wildignore = ".hg,.svn,*~,*.png,*.jpg,*.gif,*.min.js,*.swp,*.o,vendor,dist,_site"
 
--- Set highlight on search, but clear on pressing <Esc> in normal mode
-vim.opt.hlsearch = true
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
-
 -- Spell check
-vim.opt.spelllang = 'en_us'
+vim.opt.spelllang = "en_us"
 vim.opt.spell = true
 vim.keymap.set("n", "<F6>", "<cmd>setlocal spell! spell?<cr>")
 
@@ -72,8 +81,17 @@ vim.keymap.set("n", "<F6>", "<cmd>setlocal spell! spell?<cr>")
 -- Keymaps
 --
 
+-- Set highlight on search, but clear on pressing <Esc> in normal mode
+vim.opt.hlsearch = true
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+
 -- quick-save
 vim.keymap.set("n", "<leader>w", "<cmd>w<cr>")
+
+-- Exit terminal mode in the builtin terminal
+-- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
+-- or just use <C-\><C-n> to exit terminal mode
+vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- no arrow keys --- force yourself to use the home row
 vim.keymap.set("n", "<up>", '<cmd>echo "Use k!"<CR>')
@@ -85,6 +103,14 @@ vim.keymap.set("i", "<right>", '<cmd>echo "Use l!"<CR>')
 -- let the left and right arrows be useful: they can switch buffers
 vim.keymap.set("n", "<left>", ":bp<cr>")
 vim.keymap.set("n", "<right>", ":bn<cr>")
+
+-- Keybinds to make split navigation easier.
+-- Use CTRL+<hjkl> to switch between windows
+-- See `:help wincmd` for a list of all window commands
+vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
+vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
+vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
 -- Neat X clipboard integration
 -- <leader>p will paste clipboard into buffer
@@ -535,11 +561,11 @@ require("lazy").setup({
             wk.setup()
 
             wk.register({
-                ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-                ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-                ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+                ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
+                ["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
+                ["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
             })
-        end
+        end,
     },
     {
         "plasticboy/vim-markdown",
