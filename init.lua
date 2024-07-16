@@ -196,37 +196,27 @@ require("lazy").setup({
         },
     },
     {
-        "nvim-tree/nvim-tree.lua",
+        "nvim-neo-tree/neo-tree.nvim",
         version = "*",
-        lazy = false,
         dependencies = {
-            "nvim-tree/nvim-web-devicons",
+            "nvim-lua/plenary.nvim",
+            "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+            "MunifTanjim/nui.nvim",
         },
-        config = function()
-            -- disable netrw at the very start of your init.lua
-            vim.g.loaded_netrw = 1
-            vim.g.loaded_netrwPlugin = 1
-
-            -- optionally enable 24-bit colour
-            vim.opt.termguicolors = true
-
-            --        vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<cr>')
-            vim.keymap.set("n", "<leader>nf", "<cmd>NvimTreeFindFile<cr>")
-
-            require("nvim-tree").setup({
-                renderer = {
-                    add_trailing = true,
-                    highlight_opened_files = "icon",
-                    highlight_git = true,
+        cmd = "Neotree",
+        keys = {
+            { "\\", ":Neotree reveal<CR>", { desc = "NeoTree reveal" } },
+            { "<leader>n", ":Neotree reveal<CR>", { desc = "NeoTree reveal" } },
+        },
+        opts = {
+            filesystem = {
+                window = {
+                    mappings = {
+                        ["<leader>n"] = "close_window",
+                    },
                 },
-                -- integration with nvim-rooter
-                update_cwd = true,
-                update_focused_file = {
-                    enable = true,
-                    update_cwd = true,
-                },
-            })
-        end,
+            },
+        },
     },
     {
         "notjedi/nvim-rooter.lua",
@@ -358,6 +348,7 @@ require("lazy").setup({
         config = function()
             local lspconfig = require("lspconfig")
             local util = require("lspconfig/util")
+            local lsp_signature = require("lsp_signature")
 
             -- Diagnostic keymaps
             -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -410,13 +401,15 @@ require("lazy").setup({
 
                     -- Fuzzy find all the symbols in your current document.
                     -- Symbols are things like variables, functions, types, etc.
-                    -- map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+                    map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
 
                     -- Fuzzy find all the symbols in your current workspace.
                     -- Similar to document symbols, except searches over your entire project.
-                    -- map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+                    -- map( "<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
+                    -- When you move your cursor, the highlights will be cleared (the second autocommand). w
                     local client = vim.lsp.get_client_by_id(event.data.client_id)
+
                     -- The following autocommand is used to enable inlay hints in your
                     -- code, if the language server you are using supports them
                     --
@@ -443,6 +436,9 @@ require("lazy").setup({
                             staticcheck = true,
                         },
                     },
+                    --on_attach = function()
+                    --    lsp_signature.on_attach()
+                    --end,
                 },
                 rust_analyzer = {
                     settings = {
@@ -617,6 +613,19 @@ require("lazy").setup({
             },
         },
     },
+    {
+        "ray-x/lsp_signature.nvim",
+        event = "LspAttach",
+        opts = {},
+        config = function(_, opts)
+            -- Get signatures when in argument lists.
+            require("lsp_signature").setup({
+                doc_lines = 20,
+                handler_opts = {
+                    border = "none",
+                },
+                hint_enable = false,
+            })
+        end,
+    },
 })
-
--- vim: ts=4 sts=4 sw=4 et
