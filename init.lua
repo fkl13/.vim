@@ -388,6 +388,11 @@ require("lazy").setup({
                     prompt_title = "Live Grep in Open Files",
                 })
             end, { desc = "[S]earch [/] in Open Files" })
+
+            -- Shortcut for searching your Neovim configuration files
+            vim.keymap.set("n", "<leader>sn", function()
+                builtin.find_files({ cwd = vim.fn.stdpath("config") })
+            end, { desc = "[S]earch [N]eovim files" })
         end,
     },
     {
@@ -447,7 +452,7 @@ require("lazy").setup({
                     -- Jump to the type of the word under your cursor.
                     -- Useful when you're not sure what type a variable is and you want to see
                     -- the definition of its *type*, not where it was *defined*.
-                    -- map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+                    map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
 
                     -- Fuzzy find all the symbols in your current document.
                     -- Symbols are things like variables, functions, types, etc.
@@ -499,6 +504,17 @@ require("lazy").setup({
                             checkOnSave = {
                                 command = "clippy",
                             },
+                        },
+                    },
+                },
+                lua_ls = {
+                    settings = {
+                        Lua = {
+                            completion = {
+                                callSnippet = "Replace",
+                            },
+                            -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+                            -- diagnostics = { disable = { 'missing-fields' } },
                         },
                     },
                 },
