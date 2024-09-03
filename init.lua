@@ -479,16 +479,17 @@ require("lazy").setup({
                     root_dir = util.root_pattern("go.work", "go.mod", ".git"),
                     settings = {
                         gopls = {
-                            usePlaceholders = true,
+                            completeUnimported = true,
+                            usePlaceholders = false,
                             analyses = {
                                 unusedparams = true,
+                                unreachable = true,
                             },
                             staticcheck = true,
+                            -- vulncheck = "Imports",
+                            -- gofumpt = true,
                         },
                     },
-                    --on_attach = function()
-                    --    lsp_signature.on_attach()
-                    --end,
                 },
                 rust_analyzer = {
                     settings = {
@@ -575,7 +576,7 @@ require("lazy").setup({
         build = ":TSUpdate",
         opts = {
             ensure_installed = { "bash", "c", "diff", "html", "lua", "luadoc", "markdown", "vim", "vimdoc" },
-            auto_install = true,
+            auto_install = false,
             highlight = {
                 enable = true,
                 additional_vim_regex_highlighting = { "ruby" },
