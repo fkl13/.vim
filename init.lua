@@ -75,7 +75,7 @@ vim.opt.wildignore = ".hg,.svn,*~,*.png,*.jpg,*.gif,*.min.js,*.swp,*.o,vendor,di
 -- Spell check
 vim.opt.spelllang = "en_us"
 vim.opt.spell = true
-vim.keymap.set("n", "<F6>", "<cmd>setlocal spell! spell?<cr>")
+vim.keymap.set("n", "<F6>", "<cmd>setlocal spell! spell?<cr>", { desc = "Toggle spell check" })
 
 --
 -- Keymaps
@@ -86,7 +86,7 @@ vim.opt.hlsearch = true
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- quick-save
-vim.keymap.set("n", "<leader>w", "<cmd>w<cr>")
+vim.keymap.set("n", "<leader>w", "<cmd>w<cr>", { desc = "Save file" })
 
 -- Exit terminal mode in the builtin terminal
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
@@ -115,8 +115,8 @@ vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper win
 -- Neat X clipboard integration
 -- <leader>p will paste clipboard into buffer
 -- <leader>c will copy entire buffer into clipboard
-vim.keymap.set("n", "<leader>p", "<cmd>read !wl-paste<cr>")
-vim.keymap.set("n", "<leader>c", "<cmd>w !wl-copy<cr><cr>")
+vim.keymap.set("n", "<leader>p", "<cmd>read !wl-paste<cr>", { desc = "Paste clipboard into buffer" })
+vim.keymap.set("n", "<leader>c", "<cmd>w !wl-copy<cr><cr>", { desc = "Copy entire buffer into clipboard" })
 
 -- always center search results
 vim.keymap.set("n", "n", "nzz", { silent = true })
@@ -259,13 +259,12 @@ require("lazy").setup({
         cmd = "Neotree",
         keys = {
             { "\\", ":Neotree reveal<CR>", { desc = "NeoTree reveal", silent = true } },
-            { "<leader>n", ":Neotree reveal<CR>", { desc = "NeoTree reveal", silent = true } },
         },
         opts = {
             filesystem = {
                 window = {
                     mappings = {
-                        ["<leader>n"] = "close_window",
+                        ["\\"] = "close_window",
                     },
                 },
             },
@@ -361,14 +360,14 @@ require("lazy").setup({
 
             -- See `:help telescope.builtin`
             local builtin = require("telescope.builtin")
-            vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
+            vim.keymap.set("n", "<lader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
             vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
             vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
-            vim.keymap.set("n", "<C-p>", builtin.find_files)
+            vim.keymap.set("n", "<C-p>", builtin.find_files, { desc = "[S]earch [F]iles" })
             vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
             vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
             vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
-            vim.keymap.set("n", "<C-g>", builtin.live_grep)
+            vim.keymap.set("n", "<C-g>", builtin.live_grep, { desc = "[S]earch by [G]rep" })
             vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
             vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
             vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -393,9 +392,9 @@ require("lazy").setup({
             end, { desc = "[S]earch [/] in Open Files" })
 
             -- Shortcut for searching your Neovim configuration files
-            vim.keymap.set("n", "<leader>sn", function()
-                builtin.find_files({ cwd = vim.fn.stdpath("config") })
-            end, { desc = "[S]earch [N]eovim files" })
+            -- vim.keymap.set("n", "<leader>sn", function()
+            --    builtin.find_files({ cwd = vim.fn.stdpath("config") })
+            -- end, { desc = "[S]earch [N]eovim files" })
         end,
     },
     {
@@ -618,21 +617,50 @@ require("lazy").setup({
     },
     {
         "folke/which-key.nvim",
-        event = "VeryLazy",
-        init = function()
-            vim.o.timeout = true
-            vim.o.timeoutlen = 300
-        end,
-        config = function()
-            local wk = require("which-key")
-            wk.setup()
-
-            wk.register({
-                ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-                ["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-                ["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-            })
-        end,
+        event = "VimEnter",
+        opts = {
+            icons = {
+                -- set icon mappings to true if you have a Nerd Font
+                mappings = vim.g.have_nerd_font,
+                keys = vim.g.have_nerd_font and {} or {
+                    Up = "<Up> ",
+                    Down = "<Down> ",
+                    Left = "<Left> ",
+                    Right = "<Right> ",
+                    C = "<C-…> ",
+                    M = "<M-…> ",
+                    D = "<D-…> ",
+                    S = "<S-…> ",
+                    CR = "<CR> ",
+                    Esc = "<Esc> ",
+                    ScrollWheelDown = "<ScrollWheelDown> ",
+                    ScrollWheelUp = "<ScrollWheelUp> ",
+                    NL = "<NL> ",
+                    BS = "<BS> ",
+                    Space = "<Space> ",
+                    Tab = "<Tab> ",
+                    F1 = "<F1>",
+                    F2 = "<F2>",
+                    F3 = "<F3>",
+                    F4 = "<F4>",
+                    F5 = "<F5>",
+                    F6 = "<F6>",
+                    F7 = "<F7>",
+                    F8 = "<F8>",
+                    F9 = "<F9>",
+                    F10 = "<F10>",
+                    F11 = "<F11>",
+                    F12 = "<F12>",
+                },
+            },
+            spec = {
+                { "<leader>d", group = "[D]ocument" },
+                { "<leader>r", group = "[R]ename" },
+                { "<leader>s", group = "[S]earch" },
+                { "<leader>t", group = "[T]oggle" },
+                { "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
+            },
+        },
     },
     {
         "plasticboy/vim-markdown",
