@@ -1,11 +1,13 @@
 # .vim
 
-My vim dot files.
+My Neovim dot files.
 
 ## Requirements
 
-Requires Neovim >= 0.5 for most of the plugins to work. And uses
-[vim-plug](https://github.com/junegunn/vim-plug) as plugin manager.
+Requires Neovim >= 0.9 for most of the plugins to work.
+
+- [lua-language-server](https://github.com/LuaLS/lua-language-server)
+- [StyLua](https://github.com/JohnnyMorganz/StyLua)
 
 ## Installation
 
@@ -16,7 +18,6 @@ $ cd ~
 $ git clone https://github.com/fkl13/.vim.git .vim
 $ cd $HOME/.vim
 $ make install
-$ make install-plugins
 ```
 
 ### Makefile
@@ -25,9 +26,5 @@ You can use the [`Makefile`](Makefile) to run the following commands.
 
 ```console
 $ make help
-clean-plugins                  Remove unlisted plugins
-install-plugins                Install all plugins
 install                        Sets up symlinks for vim and neovim
-update-plugins                 Updates all plugins
-upgrade-vim-plug               Upgrade vim-plug
 ```

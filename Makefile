@@ -5,7 +5,6 @@ install: ## Sets up symlinks for vim and neovim
 	ln -snf "$(HOME)/.vim/vimrc" "$(HOME)/.vimrc"
 	mkdir -p "$(XDG_CONFIG_HOME)"
 	ln -snf "$(HOME)/.vim" "$(XDG_CONFIG_HOME)/nvim"
-	#ln -snf "$(HOME)/.vim/init.lua" "$(XDG_CONFIG_HOME)/nvim/init.lua"
 
 .PHONY: help
 help:
