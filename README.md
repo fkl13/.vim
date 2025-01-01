@@ -4,7 +4,7 @@ My Neovim dot files.
 
 ## Requirements
 
-Requires Neovim >= 0.9 for most of the plugins to work.
+Requires Neovim >= 0.10 for most of the plugins to work.
 
 - [lua-language-server](https://github.com/LuaLS/lua-language-server)
 - [StyLua](https://github.com/JohnnyMorganz/StyLua)
