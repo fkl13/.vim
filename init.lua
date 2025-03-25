@@ -307,6 +307,14 @@ require("lazy").setup({
                 section_separators = "",
                 theme = "gruvbox-material",
             },
+            sections = {
+                lualine_c = {
+                    {
+                        "filename",
+                        path = 1,
+                    },
+                },
+            },
         },
     },
     {
@@ -512,7 +520,6 @@ require("lazy").setup({
                             analyses = {
                                 unusedparams = true,
                                 unreachable = true,
-                                fieldalignment = true,
                                 nilness = true,
                                 useany = true,
                             },
