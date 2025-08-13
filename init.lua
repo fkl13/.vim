@@ -772,6 +772,7 @@ require("lazy").setup({
                 lua = { "stylua" },
                 go = { "goimports", "gofumpt" },
                 rust = { "rustfmt" },
+                json = { "jq" },
             },
         },
     },
