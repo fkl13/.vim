@@ -183,7 +183,6 @@ require("lazy").setup({
             -- vim.cmd.colorscheme('sonokai')
         end,
     },
-    { "tpope/vim-sleuth" },
     {
         "lewis6991/gitsigns.nvim",
         opts = {
@@ -430,11 +429,10 @@ require("lazy").setup({
         "neovim/nvim-lspconfig",
         dependencies = {
             { "j-hui/fidget.nvim", opts = {} },
+            "saghen/blink.cmp",
         },
         config = function()
-            local lspconfig = require("lspconfig")
             local util = require("lspconfig/util")
-            local lsp_signature = require("lsp_signature")
 
             -- Diagnostic keymaps
             -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -448,8 +446,9 @@ require("lazy").setup({
             vim.api.nvim_create_autocmd("LspAttach", {
                 group = vim.api.nvim_create_augroup("UserLspConfig", {}),
                 callback = function(event)
-                    local map = function(keys, func, desc)
-                        vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+                    local map = function(keys, func, desc, mode)
+                        mode = mode or "n"
+                        vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
                     end
 
                     -- Jump to the definition of the word under your cursor.
@@ -487,22 +486,46 @@ require("lazy").setup({
 
                     -- Fuzzy find all the symbols in your current document.
                     -- Symbols are things like variables, functions, types, etc.
-                    map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+                    map("gO", require("telescope.builtin").lsp_document_symbols, "Open Document Symbols")
 
                     -- Fuzzy find all the symbols in your current workspace.
                     -- Similar to document symbols, except searches over your entire project.
-                    -- map( "<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+                    map("gW", require("telescope.builtin").lsp_dynamic_workspace_symbols, "Open Workspace Symbols")
 
-                    -- When you move your cursor, the highlights will be cleared (the second autocommand). w
+                    -- highlight references of the word under your cursor when your cursor rests there for a little while.
+                    -- See `:help CursorHold` for information about when this is executed
+                    -- When you move your cursor, the highlights will be cleared (the second autocommand).
                     local client = vim.lsp.get_client_by_id(event.data.client_id)
+                    if client then
+                        -- When you move your cursor, the highlights will be cleared (the second autocommand).
+                        local highlight_augroup =
+                            vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
+                        vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+                            buffer = event.buf,
+                            group = highlight_augroup,
+                            callback = vim.lsp.buf.document_highlight,
+                        })
 
-                    -- The following autocommand is used to enable inlay hints in your
+                        vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+                            buffer = event.buf,
+                            group = highlight_augroup,
+                            callback = vim.lsp.buf.clear_references,
+                        })
+
+                        vim.api.nvim_create_autocmd("LspDetach", {
+                            group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+                            callback = function(event2)
+                                vim.lsp.buf.clear_references()
+                                vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
+                            end,
+                        })
+                    end
+
+                    -- creates a keymap to toggle inlay hints in your
                     -- code, if the language server you are using supports them
-                    --
-                    -- This may be unwanted, since they displace some of your code
-                    if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+                    if client then
                         map("<leader>th", function()
-                            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+                            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
                         end, "[T]oggle Inlay [H]ints")
                     end
                 end,
@@ -515,7 +538,6 @@ require("lazy").setup({
                     root_dir = util.root_pattern("go.work", "go.mod", ".git"),
                     settings = {
                         gopls = {
-                            completeUnimported = true,
                             usePlaceholders = false,
                             analyses = {
                                 unusedparams = true,
@@ -572,71 +594,69 @@ require("lazy").setup({
                 },
             }
 
-            local capabilities = vim.lsp.protocol.make_client_capabilities()
-            capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-            for server_name, server in pairs(servers) do
-                lspconfig[server_name].setup(server)
+            local lspconfig = require("lspconfig")
+            for server_name, server_config in pairs(servers) do
+                server_config.capabilities = require("blink.cmp").get_lsp_capabilities(server_config.capabilities)
+                lspconfig[server_name].setup(server_config)
             end
         end,
     },
-    { -- Autocompletion
-        "hrsh7th/nvim-cmp",
-        -- load cmp on InsertEnter
-        event = "InsertEnter",
-        dependencies = {
-            "neovim/nvim-lspconfig",
-            "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-path",
-            "hrsh7th/cmp-cmdline",
-            "L3MON4D3/LuaSnip",
-            "saadparwaiz1/cmp_luasnip",
+    {
+        "saghen/blink.cmp",
+        event = "VimEnter",
+        version = "1.*",
+        dependencies = {},
+        --- @module 'blink.cmp'
+        --- @type blink.cmp.Config
+        opts = {
+            keymap = {
+                -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
+                -- 'super-tab' for mappings similar to vscode (tab to accept)
+                -- 'enter' for enter to accept
+                -- 'none' for no mappings
+                --
+                -- All presets have the following mappings:
+                -- C-space: Open menu or open docs if already open
+                -- C-n/C-p or Up/Down: Select next/previous item
+                -- C-e: Hide menu
+                -- C-k: Toggle signature help (if signature.enabled = true)
+                --
+                -- See :h blink-cmp-config-keymap for defining your own keymap
+                preset = "default",
+            },
+
+            appearance = {
+                -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+                -- Adjusts spacing to ensure icons are aligned
+                nerd_font_variant = "mono",
+            },
+
+            completion = {
+                -- By default, you may press `<c-space>` to show the documentation.
+                -- Optionally, set `auto_show = true` to show the documentation after a delay.
+                documentation = { auto_show = false, auto_show_delay_ms = 500 },
+                ghost_text = { enabled = true },
+            },
+
+            sources = {
+                default = { "lsp", "path", "snippets", "buffer" },
+                providers = {},
+            },
+
+            -- snippets = { preset = "luasnip" },
+
+            -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
+            -- which automatically downloads a prebuilt binary when enabled.
+            --
+            -- By default, we use the Lua implementation instead, but you may enable
+            -- the rust implementation via `'prefer_rust_with_warning'`
+            --
+            -- See :h blink-cmp-config-fuzzy for more information
+            fuzzy = { implementation = "lua" },
+
+            -- Shows a signature help window while you type arguments for a function
+            signature = { enabled = true },
         },
-        config = function()
-            -- See `:help cmp`
-            local cmp = require("cmp")
-            local luasnip = require("luasnip")
-            luasnip.config.setup({})
-
-            cmp.setup({
-                snippet = {
-                    expand = function(args)
-                        luasnip.lsp_expand(args.body)
-                    end,
-                },
-                mapping = cmp.mapping.preset.insert({
-                    -- Select the [n]ext item
-                    ["<C-n>"] = cmp.mapping.select_next_item(),
-                    -- Select the [p]revious item
-                    ["<C-p>"] = cmp.mapping.select_prev_item(),
-
-                    -- Scroll the documentation window [b]ack / [f]orward
-                    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-                    ["<C-f>"] = cmp.mapping.scroll_docs(4),
-                    ["<C-e>"] = cmp.mapping.abort(),
-
-                    -- Manually trigger a completion from nvim-cmp.
-                    ["<C-Space>"] = cmp.mapping.complete(),
-                    -- Accept currently selected item.
-                    ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                }),
-                sources = {
-                    { name = "nvim_lsp" },
-                    { name = "luasnip" },
-                    { name = "path" },
-                },
-            })
-
-            -- Use cmdline & path source for ':'
-            cmp.setup.cmdline(":", {
-                mapping = cmp.mapping.preset.cmdline(),
-                sources = cmp.config.sources({
-                    { name = "path" },
-                }, {
-                    { name = "cmdline" },
-                }),
-            })
-        end,
     },
     {
         "pmizio/typescript-tools.nvim",
@@ -664,9 +684,9 @@ require("lazy").setup({
             --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
         end,
     },
-    {
-        "RRethy/vim-illuminate",
-    },
+    --    {
+    --        "RRethy/vim-illuminate",
+    --    },
     {
         "tpope/vim-fugitive",
     },
@@ -779,21 +799,6 @@ require("lazy").setup({
                 ["_"] = { "trim_whitespace" },
             },
         },
-    },
-    {
-        "ray-x/lsp_signature.nvim",
-        event = "LspAttach",
-        opts = {},
-        config = function(_, opts)
-            -- Get signatures when in argument lists.
-            require("lsp_signature").setup({
-                doc_lines = 20,
-                handler_opts = {
-                    border = "none",
-                },
-                hint_enable = false,
-            })
-        end,
     },
     {
         "khaveesh/vim-fish-syntax",
