@@ -803,4 +803,7 @@ require("lazy").setup({
     {
         "khaveesh/vim-fish-syntax",
     },
+    {
+        "nmac427/guess-indent.nvim",
+    },
 })
