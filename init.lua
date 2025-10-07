@@ -576,6 +576,9 @@ require("lazy").setup({
                         ["rust-analyzer"] = {
                             -- enable clippy diagnostics on save
                             checkOnSave = {
+                                enable = true,
+                            },
+                            check = {
                                 command = "clippy",
                             },
                         },
