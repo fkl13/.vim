@@ -795,6 +795,7 @@ require("lazy").setup({
                 lua = { "stylua" },
                 go = { "goimports", "gofumpt" },
                 rust = { "rustfmt" },
+                python = { "ruff_format", "ruff_fix" },
                 json = { "jq" },
                 yaml = { "yamlfmt" },
                 -- Use the "_" filetype to run formatters on filetypes that don't
