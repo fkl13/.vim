@@ -282,18 +282,15 @@ require("lazy").setup({
             indent = { char = "|" },
         },
     },
-    {
-        "windwp/nvim-autopairs",
-        event = "InsertEnter",
-        dependencies = { "hrsh7th/nvim-cmp" },
-        config = function()
-            require("nvim-autopairs").setup({})
-            -- If you want to automatically add `(` after selecting a function or method
-            local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-            local cmp = require("cmp")
-            cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-        end,
-    },
+    --{
+    --    "windwp/nvim-autopairs",
+    --    event = "InsertEnter",
+    --    config = function()
+    --        require("nvim-autopairs").setup({
+    --            check_ts = true,
+    --        })
+    --    end,
+    --},
     {
         "windwp/nvim-ts-autotag",
     },
@@ -531,11 +528,13 @@ require("lazy").setup({
                 end,
             })
 
-            local servers = {
-                gopls = {
-                    cmd = { "gopls", "serve" },
+            local capabilities = require("blink.cmp").get_lsp_capabilities()
+
+            -- Golang
+            if vim.fn.executable("gopls") == 1 then
+                vim.lsp.config("gopls", {
+                    capabilities = capabilities,
                     filetypes = { "go", "gomod", "gowork", "gotmpl" },
-                    root_dir = util.root_pattern("go.work", "go.mod", ".git"),
                     settings = {
                         gopls = {
                             usePlaceholders = false,
@@ -569,10 +568,16 @@ require("lazy").setup({
                             gofumpt = true,
                         },
                     },
-                },
-                rust_analyzer = {
+                })
+                vim.lsp.enable("gopls")
+            end --
+
+            -- Rust
+            if vim.fn.executable("rust-analyzer") == 1 then
+                vim.lsp.config("rust_analyzer", {
+                    capabilities = capabilities,
+                    -- config from: https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
                     settings = {
-                        -- config from: https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
                         ["rust-analyzer"] = {
                             -- enable clippy diagnostics on save
                             checkOnSave = {
@@ -583,8 +588,19 @@ require("lazy").setup({
                             },
                         },
                     },
-                },
-                lua_ls = {
+                })
+                vim.lsp.enable("rust_analyzer")
+            end
+
+            -- Python
+            if vim.fn.executable("basedpyright") == 1 then
+                vim.lsp.enable("basedpyright")
+            end
+
+            --Lua
+            if vim.fn.executable("lua-language-server") == 1 then
+                vim.lsp.config("lua_ls", {
+                    capabilities = capabilities,
                     settings = {
                         Lua = {
                             completion = {
@@ -594,13 +610,10 @@ require("lazy").setup({
                             -- diagnostics = { disable = { 'missing-fields' } },
                         },
                     },
-                },
-            }
-
-            local lspconfig = require("lspconfig")
-            for server_name, server_config in pairs(servers) do
-                server_config.capabilities = require("blink.cmp").get_lsp_capabilities(server_config.capabilities)
-                lspconfig[server_name].setup(server_config)
+                })
+                vim.lsp.enable("lua_ls", {
+                    capabilities = require("blink.cmp").get_lsp_capabilities(),
+                })
             end
         end,
     },
@@ -687,9 +700,6 @@ require("lazy").setup({
             --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
         end,
     },
-    --    {
-    --        "RRethy/vim-illuminate",
-    --    },
     {
         "tpope/vim-fugitive",
     },
