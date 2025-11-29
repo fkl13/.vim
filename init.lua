@@ -813,6 +813,7 @@ require("lazy").setup({
                 python = { "ruff_format", "ruff_fix" },
                 json = { "jq" },
                 yaml = { "yamlfmt" },
+                dockerfile = { "dockerfmt" },
                 -- Use the "_" filetype to run formatters on filetypes that don't
                 -- have other formatters configured.
                 ["_"] = { "trim_whitespace" },
