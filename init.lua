@@ -615,6 +615,11 @@ require("lazy").setup({
                     capabilities = require("blink.cmp").get_lsp_capabilities(),
                 })
             end
+
+            -- Docker
+            if vim.fn.executable("docker-language-server") == 1 then
+                vim.lsp.enable("docker_language_server")
+            end
         end,
     },
     {
