@@ -295,6 +295,13 @@ require("lazy").setup({
         "windwp/nvim-ts-autotag",
     },
     {
+        "windwp/nvim-autopairs",
+        event = "InsertEnter",
+        config = true,
+        -- use opts = {} for passing setup options
+        -- this is equivalent to setup({}) function
+    },
+    {
         "nvim-lualine/lualine.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         opts = {
@@ -657,6 +664,7 @@ require("lazy").setup({
                 -- Optionally, set `auto_show = true` to show the documentation after a delay.
                 documentation = { auto_show = false, auto_show_delay_ms = 500 },
                 ghost_text = { enabled = true },
+                accept = { auto_brackets = { enabled = true } },
             },
 
             sources = {
