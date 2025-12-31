@@ -822,6 +822,7 @@ require("lazy").setup({
                 json = { "jq" },
                 yaml = { "yamlfmt" },
                 dockerfile = { "dockerfmt" },
+                toml = { "taplo" },
                 -- Use the "_" filetype to run formatters on filetypes that don't
                 -- have other formatters configured.
                 ["_"] = { "trim_whitespace" },
